@@ -1,0 +1,72 @@
+:root {
+    --bs-blue: #696cff;
+    --bs-primary: #696cff;
+    --bs-body-font-family: 'Nunito', sans-serif;
+}
+
+body {
+    background-color: #f0f0f0 !important;
+}
+
+.layout-wrapper {
+    display: flex;
+}
+
+.layout-container {
+    flex: 1 1 auto;
+    display: flex;
+}
+
+.layout-page {
+    flex: 1 1 auto;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+.bg-navbar-theme {
+    background-color: #fff !important;
+}
+
+.content-wrapper {
+    flex: 1 1 auto;
+}
+
+.container-xxl {
+    max-width: 1440px;
+}
+
+.flex-grow-1 {
+    flex-grow: 1 !important;
+}
+
+.container-p-y {
+    padding-top: 1.625rem !important;
+    padding-bottom: 1.625rem !important;
+}
+
+.navbar {
+    background-color: #4a5568 !important;
+}
+
+.navbar-light .navbar-nav .nav-link {
+    color: white !important;
+}
+
+.navbar-nav .nav-link {
+    color: #697a8d;
+}
+
+.navbar-nav .nav-link:hover {
+    color: #696cff;
+}
+
+.dropdown-menu {
+    box-shadow: 0 0.25rem 1rem rgba(161, 172, 184, 0.45);
+    border: 0 solid #d9dee3;
+}
+
+.dropdown-item:hover {
+    background-color: rgba(105, 108, 255, 0.08);
+    color: #696cff;
+}
