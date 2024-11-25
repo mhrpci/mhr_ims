@@ -74,7 +74,7 @@
             </div>
         </div>
     </div>
-
+<!-- 
     <form action="{{ route('products.import') }}" method="POST" enctype="multipart/form-data">
         @csrf
         <div class="input-group">
@@ -83,7 +83,7 @@
         </div>
     </form>
 
-    <a href="{{ route('products.export') }}" class="btn btn-success">Export Products</a>
+    <a href="{{ route('products.export') }}" class="btn btn-success">Export Products</a> -->
 </div>
 @endsection
 
