@@ -42,11 +42,13 @@
 
                     <hr class="my-4">
 
+                    @if($user->canEditProfile())
                     <div class="d-flex justify-content-end">
                         <a href="{{ route('profile.edit') }}" class="btn btn-primary">
                             <i class="bi bi-pencil-square me-2"></i>{{ __('Edit Profile') }}
                         </a>
                     </div>
+                    @endif
                 </div>
             </div>
         </div>

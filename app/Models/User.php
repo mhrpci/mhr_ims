@@ -249,4 +249,9 @@ class User extends Authenticatable
     {
         return $this->hasRole(['Super Admin']);
     }
+
+    public function canEditProfile()
+    {
+        return $this->hasRole(['Admin', 'Super Admin']);
+    }
 }
