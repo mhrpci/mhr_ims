@@ -556,13 +556,12 @@
                 preloader.style.opacity = '0';
                 preloader.style.visibility = 'hidden';
             }, 1000); // Changed from 2000 to 1000 milliseconds (1 second)
-
             // Check if notifications are enabled
-            const notificationsEnabled = {{ Auth::check() && isset($userSettings) ? 'true' : 'false' }};
-            const emailNotificationsEnabled = {{ Auth::check() && isset($userSettings) && $userSettings->notification_email ? 'true' : 'false' }};
-            const pushNotificationsEnabled = {{ Auth::check() && isset($userSettings) && $userSettings->notification_push ? 'true' : 'false' }};
+            const notificationsEnabled = document.querySelector('input[name="notificationsEnabled"]:checked') ? 'true' : 'false';
+            const emailNotificationsEnabled = document.querySelector('input[name="emailNotificationsEnabled"]:checked') ? 'true' : 'false';
+            const pushNotificationsEnabled = document.querySelector('input[name="pushNotificationsEnabled"]:checked') ? 'true' : 'false';
 
-            if (notificationsEnabled) {
+            if (notificationsEnabled === 'true') {
                 if (emailNotificationsEnabled) {
                     // Enable email notifications functionality
                     console.log('Email notifications are enabled');
