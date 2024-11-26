@@ -35,37 +35,41 @@
                     </thead>
                     <tbody>
                         @foreach($users as $user)
-                        <tr>
-                            <td>
-                                <div class="d-flex align-items-center">
-                                    <img src="{{ $user->avatar_url }}" alt="{{ $user->username }}"
-                                         class="rounded-circle me-2" style="width: 32px; height: 32px;">
-                                    {{ $user->username }}
-                                </div>
-                            </td>
-                            <td>{{ $user->email }}</td>
-                            <td>
-                                @foreach($user->roles as $role)
-                                    <span class="badge bg-primary">{{ $role->name }}</span>
-                                @endforeach
-                            </td>
-                            <td>{{ $user->branch->name ?? 'N/A' }}</td>
-                            <td>
-                                <a href="{{ route('users.show', $user) }}" class="btn btn-sm btn-info" title="View">
-                                    <i class="bi bi-eye"></i> Preview
-                                </a>
-                                <a href="{{ route('users.edit', $user) }}" class="btn btn-sm btn-warning" title="Edit">
-                                    <i class="bi bi-pencil"></i> Edit
-                                </a>
-                                <form action="{{ route('users.destroy', $user) }}" method="POST" class="d-inline">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="btn btn-sm btn-danger" title="Delete" onclick="return confirm('Are you sure you want to delete this user?')">
-                                        <i class="bi bi-trash"></i> Delete
-                                    </button>
-                                </form>
-                            </td>
-                        </tr>
+                            @if(!$user->roles->contains('name', 'Super Admin'))
+                            <tr>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <img src="{{ $user->avatar_url }}" alt="{{ $user->username }}"
+                                             class="rounded-circle me-2" style="width: 32px; height: 32px;">
+                                        {{ $user->username }}
+                                    </div>
+                                </td>
+                                <td>{{ $user->email }}</td>
+                                <td>
+                                    @foreach($user->roles as $role)
+                                        <span class="badge bg-primary">{{ $role->name }}</span>
+                                    @endforeach
+                                </td>
+                                <td>{{ $user->branch->name ?? 'N/A' }}</td>
+                                <td>
+                                    <a href="{{ route('users.show', $user) }}" class="btn btn-sm btn-info" title="View">
+                                        <i class="bi bi-eye"></i> Preview
+                                    </a>
+                                    <a href="{{ route('users.edit', $user) }}" class="btn btn-sm btn-warning" title="Edit">
+                                        <i class="bi bi-pencil"></i> Edit
+                                    </a>
+                                    @if($user->canDeleteUsers())
+                                    <form action="{{ route('users.destroy', $user) }}" method="POST" class="d-inline">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="btn btn-sm btn-danger" title="Delete" onclick="return confirm('Are you sure you want to delete this user?')">
+                                            <i class="bi bi-trash"></i> Delete
+                                        </button>
+                                    </form>
+                                    @endif
+                                </td>
+                            </tr>
+                            @endif
                         @endforeach
                     </tbody>
                 </table>

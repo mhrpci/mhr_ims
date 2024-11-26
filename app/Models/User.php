@@ -244,4 +244,9 @@ class User extends Authenticatable
         // Implement your permission logic here
         return true; // or based on user roles/permissions
     }
+
+    public function canDeleteUsers()
+    {
+        return $this->hasRole(['Super Admin']);
+    }
 }

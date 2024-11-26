@@ -64,9 +64,11 @@
                         <a href="{{ route('users.edit', $user) }}" class="btn btn-primary me-2">
                             <i class="bi bi-pencil me-2"></i>Edit Profile
                         </a>
+                        @if($user->canDeleteUsers())
                         <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteUserModal">
                             <i class="bi bi-trash me-2"></i>Delete User
                         </button>
+                        @endif
                     </div>
                 </div>
             </div>
