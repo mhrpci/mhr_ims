@@ -183,7 +183,6 @@
                                     <th>Branch Details</th>
                                     <th>Status</th>
                                     <th>Created By</th>
-                                    <th>Updated By</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -245,13 +244,6 @@
                                         <br>
                                         <small class="text-muted">
                                             {{ \Carbon\Carbon::parse($movement->created_at)->format('M d, Y H:i') }}
-                                        </small>
-                                    </td>
-                                    <td>
-                                        {{ $movement->updater->username ?? 'N/A' }}
-                                        <br>
-                                        <small class="text-muted">
-                                            {{ \Carbon\Carbon::parse($movement->updated_at)->format('M d, Y H:i') }}
                                         </small>
                                     </td>
                                 </tr>

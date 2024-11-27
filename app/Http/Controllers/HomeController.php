@@ -74,8 +74,11 @@ class HomeController extends Controller
         if (!$user) return 0;
 
         try {
-            $query = Product::whereHas('inventories', function ($query) {
+            $query = Product::whereHas('inventories', function ($query) use ($user) {
                 $query->where('quantity', '>', 0);
+                if ($user->branch_id) {
+                    $query->where('branch_id', $user->branch_id);
+                }
             });
 
             if ($user->isBranchRestricted()) {
@@ -296,7 +299,7 @@ class HomeController extends Controller
                 ->union($stockOutsQuery)
                 ->union($stockTransfersQuery)
                 ->orderBy('date', 'desc')
-                ->take(5)
+                ->limit(5)
                 ->get();
 
             // Transform the collection to include proper product and branch relationships

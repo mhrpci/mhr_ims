@@ -93,56 +93,81 @@
             </div>
         </div>
     </div>
-</div>
 
-@if($stockTransfer->status === 'pending' && (auth()->user()->hasRole(['Admin', 'Super Admin']) ||
-    (auth()->user()->hasRole('Branch Manager') && auth()->user()->branch_id === $stockTransfer->from_branch_id)))
-
-<!-- Approve Modal -->
-<div class="modal fade" id="approveModal" tabindex="-1">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Approve Stock Transfer</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body">
-                Are you sure you want to approve this stock transfer?
-            </div>
-            <div class="modal-footer">
-                <form action="{{ route('stock_transfers.approve', $stockTransfer) }}" method="POST">
-                    @csrf
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-success">Approve Transfer</button>
-                </form>
+    @if($stockTransfer->status === 'pending' && (auth()->user()->hasRole(['Admin', 'Super Admin']) ||
+        (auth()->user()->hasRole('Branch Manager') && auth()->user()->branch_id === $stockTransfer->from_branch_id)))
+        <div class="card shadow mb-4">
+            <div class="card-body">
+                <h3 class="h5 mb-3">Actions</h3>
+                <button class="btn btn-success me-2" data-bs-toggle="modal" data-bs-target="#approveModal">
+                    <i class="bi bi-check-circle me-2"></i>Approve Transfer
+                </button>
+                <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#rejectModal">
+                    <i class="bi bi-x-circle me-2"></i>Reject Transfer
+                </button>
             </div>
         </div>
-    </div>
-</div>
 
-<!-- Reject Modal -->
-<div class="modal fade" id="rejectModal" tabindex="-1">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Reject Stock Transfer</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <form action="{{ route('stock_transfers.reject', $stockTransfer) }}" method="POST">
-                @csrf
-                <div class="modal-body">
-                    <div class="mb-3">
-                        <label for="rejection_reason" class="form-label">Reason for Rejection</label>
-                        <textarea class="form-control" id="rejection_reason" name="rejection_reason" required></textarea>
+        <!-- Approve Modal -->
+        <div class="modal fade" id="approveModal" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Approve Stock Transfer</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p>Are you sure you want to approve this stock transfer?</p>
+                        <div class="alert alert-info">
+                            <strong>Product:</strong> {{ $stockTransfer->inventory->product->name }}<br>
+                            <strong>Quantity:</strong> {{ $stockTransfer->quantity }}<br>
+                            <strong>From:</strong> {{ $stockTransfer->fromBranch->name }}<br>
+                            <strong>To:</strong> {{ $stockTransfer->toBranch->name }}
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <form action="{{ route('stock_transfers.approve', $stockTransfer) }}" method="POST">
+                            @csrf
+                            @method('PUT')
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                            <button type="submit" class="btn btn-success">Approve Transfer</button>
+                        </form>
                     </div>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-danger">Reject Transfer</button>
-                </div>
-            </form>
+            </div>
         </div>
-    </div>
+
+        <!-- Reject Modal -->
+        <div class="modal fade" id="rejectModal" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Reject Stock Transfer</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <form action="{{ route('stock_transfers.reject', $stockTransfer) }}" method="POST">
+                        @csrf
+                        @method('PUT')
+                        <div class="modal-body">
+                            <div class="alert alert-warning">
+                                <strong>Product:</strong> {{ $stockTransfer->inventory->product->name }}<br>
+                                <strong>Quantity:</strong> {{ $stockTransfer->quantity }}<br>
+                                <strong>From:</strong> {{ $stockTransfer->fromBranch->name }}<br>
+                                <strong>To:</strong> {{ $stockTransfer->toBranch->name }}
+                            </div>
+                            <div class="mb-3">
+                                <label for="rejection_reason" class="form-label">Rejection Reason <span class="text-danger">*</span></label>
+                                <textarea class="form-control" id="rejection_reason" name="rejection_reason" required></textarea>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                            <button type="submit" class="btn btn-danger">Reject Transfer</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    @endif
 </div>
-@endif
 @endsection

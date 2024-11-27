@@ -249,4 +249,11 @@ class User extends Authenticatable
     {
         return $this->hasRole(['Admin', 'Super Admin']);
     }
+
+    public function canReceiveStockTransferNotifications(): bool
+    {
+        return $this->hasRole(['Branch Manager', 'Admin', 'Super Admin']) &&
+            ($this->hasRole(['Admin', 'Super Admin']) || 
+             $this->branch_id === request()->stock_transfer->from_branch_id);
+    }
 }

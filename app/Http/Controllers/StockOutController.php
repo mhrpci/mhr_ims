@@ -31,13 +31,17 @@ class StockOutController extends Controller
     public function create()
     {
         $user = Auth::user();
-        $products = Product::all();
         $customers = Customer::all();
 
         if ($user->isBranchRestricted()) {
             $branches = Branch::where('id', $user->branch_id)->get();
+            $products = Product::whereHas('inventories', function ($query) use ($user) {
+                $query->where('branch_id', $user->branch_id)
+                     ->where('quantity', '>', 0);
+            })->get();
         } else {
             $branches = Branch::all();
+            $products = Product::all();
         }
 
         return view('stock_outs.create', compact('products', 'customers', 'branches'));

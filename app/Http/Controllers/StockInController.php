@@ -31,13 +31,16 @@ class StockInController extends Controller
     public function create()
     {
         $user = Auth::user();
-        $products = Product::all();
         $vendors = Vendor::all();
 
         if ($user->isBranchRestricted()) {
             $branches = Branch::where('id', $user->branch_id)->get();
+            $products = Product::whereHas('inventories', function ($query) use ($user) {
+                $query->where('branch_id', $user->branch_id);
+            })->get();
         } else {
             $branches = Branch::all();
+            $products = Product::all();
         }
 
         return view('stock_ins.create', compact('products', 'vendors', 'branches'));

@@ -201,21 +201,94 @@
                                 <div class="notifications-list">
                                     @forelse(auth()->user()->notifications()->latest()->limit(10)->get() as $notification)
                                         <div class="notification-item border-bottom p-3 {{ $notification->read_at ? 'bg-light' : 'bg-white' }}">
-                                            @if($notification->type === 'App\Notifications\StockTransferRequestNotification')
+                                            @if($notification->type === 'App\Notifications\StockTransferApprovedNotification')
                                                 <div class="d-flex justify-content-between align-items-start">
                                                     <div>
                                                         <div class="mb-1">
-                                                            <strong>Stock Transfer Request #{{ $notification->data['stock_transfer_id'] }}</strong>
+                                                            <strong>Stock Transfer Approved #{{ $notification->data['stock_transfer_id'] }}</strong>
                                                         </div>
                                                         <p class="mb-1 small text-muted">
                                                             {{ $notification->data['message'] }}
                                                         </p>
+                                                        <div class="small mb-2">
+                                                            <div>Product: {{ $notification->data['product_name'] }}</div>
+                                                            <div>Quantity: {{ $notification->data['quantity'] }}</div>
+                                                            <div>From: {{ $notification->data['from_branch'] }}</div>
+                                                            <div>To: {{ $notification->data['to_branch'] }}</div>
+                                                        </div>
                                                         <div class="d-flex gap-2">
                                                             <a href="{{ route('stock_transfers.show', $notification->data['stock_transfer_id']) }}"
                                                                class="btn btn-sm btn-primary">
                                                                 View Details
                                                             </a>
-
+                                                            @unless($notification->read_at)
+                                                                <form action="{{ route('notifications.mark-as-read', $notification->id) }}" method="POST">
+                                                                    @csrf
+                                                                    <button type="submit" class="btn btn-sm btn-outline-secondary">
+                                                                        Mark as Read
+                                                                    </button>
+                                                                </form>
+                                                            @endunless
+                                                        </div>
+                                                    </div>
+                                                    <small class="text-muted ms-2">
+                                                        {{ $notification->created_at->diffForHumans() }}
+                                                    </small>
+                                                </div>
+                                            @elseif($notification->type === 'App\Notifications\StockTransferRejectedNotification')
+                                                <div class="d-flex justify-content-between align-items-start">
+                                                    <div>
+                                                        <div class="mb-1">
+                                                            <strong>Stock Transfer Rejected #{{ $notification->data['stock_transfer_id'] }}</strong>
+                                                        </div>
+                                                        <p class="mb-1 small text-muted">
+                                                            {{ $notification->data['message'] }}
+                                                        </p>
+                                                        <div class="small mb-2">
+                                                            <div>Product: {{ $notification->data['product_name'] }}</div>
+                                                            <div>Quantity: {{ $notification->data['quantity'] }}</div>
+                                                            <div>From: {{ $notification->data['from_branch'] }}</div>
+                                                            <div>To: {{ $notification->data['to_branch'] }}</div>
+                                                            <div class="text-danger">Reason: {{ $notification->data['rejection_reason'] }}</div>
+                                                        </div>
+                                                        <div class="d-flex gap-2">
+                                                            <a href="{{ route('stock_transfers.show', $notification->data['stock_transfer_id']) }}"
+                                                               class="btn btn-sm btn-primary">
+                                                                View Details
+                                                            </a>
+                                                            @unless($notification->read_at)
+                                                                <form action="{{ route('notifications.mark-as-read', $notification->id) }}" method="POST">
+                                                                    @csrf
+                                                                    <button type="submit" class="btn btn-sm btn-outline-secondary">
+                                                                        Mark as Read
+                                                                    </button>
+                                                                </form>
+                                                            @endunless
+                                                        </div>
+                                                    </div>
+                                                    <small class="text-muted ms-2">
+                                                        {{ $notification->created_at->diffForHumans() }}
+                                                    </small>
+                                                </div>
+                                            @elseif($notification->type === 'App\Notifications\StockTransferRequestNotification')
+                                                <div class="d-flex justify-content-between align-items-start">
+                                                    <div>
+                                                        <div class="mb-1">
+                                                            <strong>New Stock Transfer Request</strong>
+                                                        </div>
+                                                        <p class="mb-1 small text-muted">
+                                                            {{ $notification->data['message'] }}
+                                                        </p>
+                                                        <div class="small mb-2">
+                                                            <div>Product: {{ $notification->data['product'] }}</div>
+                                                            <div>Quantity: {{ $notification->data['quantity'] }}</div>
+                                                            <div>Requested by: {{ $notification->data['created_by'] }}</div>
+                                                        </div>
+                                                        <div class="d-flex gap-2">
+                                                            <a href="{{ route('stock_transfers.show', $notification->data['stock_transfer_id']) }}"
+                                                               class="btn btn-sm btn-primary">
+                                                                Review Request
+                                                            </a>
                                                             @unless($notification->read_at)
                                                                 <form action="{{ route('notifications.mark-as-read', $notification->id) }}" method="POST">
                                                                     @csrf
