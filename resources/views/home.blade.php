@@ -253,9 +253,9 @@
                                     <td>
                                         {{ $movement->creator->username ?? 'N/A' }}
                                         <br>
-                                        <small class="text-muted">
+                                        <!-- <small class="text-muted">
                                             {{ \Carbon\Carbon::parse($movement->created_at)->format('M d, Y H:i') }}
-                                        </small>
+                                        </small> -->
                                     </td>
                                 </tr>
                                 @endforeach
@@ -303,6 +303,69 @@
                                 @endforeach
                             </tbody>
                         </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mt-4 g-4">
+        <div class="col-12">
+            <div class="card shadow-sm">
+                <div class="card-header bg-light">
+                    <h5 class="card-title mb-0">Product Movement Analysis (Last 3 Months)</h5>
+                </div>
+                <div class="card-body">
+                    <ul class="nav nav-tabs" id="movementTabs" role="tablist">
+                        <li class="nav-item">
+                            <a class="nav-link active" id="fast-tab" data-bs-toggle="tab" href="#fast" role="tab">
+                                Fast Moving
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" id="moderate-tab" data-bs-toggle="tab" href="#moderate" role="tab">
+                                Moderate Moving
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" id="slow-tab" data-bs-toggle="tab" href="#slow" role="tab">
+                                Slow Moving
+                            </a>
+                        </li>
+                    </ul>
+                    <div class="tab-content mt-3" id="movementTabContent">
+                        @foreach(['fast' => 'Fast', 'moderate' => 'Moderate', 'slow' => 'Slow'] as $key => $label)
+                        <div class="tab-pane fade {{ $key === 'fast' ? 'show active' : '' }}" id="{{ $key }}" role="tabpanel">
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>Product Code</th>
+                                            <th>Product Name</th>
+                                            <th>Total Quantity</th>
+                                            <th>Transactions</th>
+                                            <th>Average/Month</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @forelse($productMovement[$key] as $item)
+                                        <tr>
+                                            <td>{{ $item['product_code'] }}</td>
+                                            <td>{{ $item['product_name'] }}</td>
+                                            <td>{{ number_format($item['total_quantity']) }}</td>
+                                            <td>{{ $item['transaction_count'] }}</td>
+                                            <td>{{ number_format($item['average_per_month'], 2) }}</td>
+                                        </tr>
+                                        @empty
+                                        <tr>
+                                            <td colspan="5" class="text-center">No {{ strtolower($label) }} moving products found</td>
+                                        </tr>
+                                        @endforelse
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        @endforeach
                     </div>
                 </div>
             </div>

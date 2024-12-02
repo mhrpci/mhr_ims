@@ -44,6 +44,7 @@ class HomeController extends Controller
                 'totalTools' => $this->getTotalTools($user),
                 'nearExpiryProducts' => $this->getNearExpiryProducts($user),
                 'nearExpiryCount' => $this->getNearExpiryCount($user),
+                'productMovement' => $this->getProductMovementAnalysis($user),
             ];
 
             return view('home', $data);
@@ -594,6 +595,89 @@ class HomeController extends Controller
             return $query->count();
         } catch (\Exception $e) {
             return 0;
+        }
+    }
+
+    private function getProductMovementAnalysis($user)
+    {
+        if (!$user) return [
+            'fast' => collect([]),
+            'moderate' => collect([]),
+            'slow' => collect([])
+        ];
+
+        try {
+            $endDate = Carbon::now();
+            $startDate = Carbon::now()->subMonths(3); // Analysis period: last 3 months
+
+            // Get stock out data grouped by product
+            $query = StockOut::with(['product'])
+                ->select('product_id', 
+                    DB::raw('SUM(quantity) as total_quantity'),
+                    DB::raw('COUNT(*) as transaction_count'))
+                ->whereBetween('date', [$startDate, $endDate])
+                ->groupBy('product_id')
+                ->having('total_quantity', '>', 0);
+
+            if ($user->isBranchRestricted()) {
+                $query->where('branch_id', $user->branch_id);
+            }
+
+            $stockOutData = $query->get();
+
+            // Calculate movement thresholds
+            $totalProducts = $stockOutData->count();
+            if ($totalProducts === 0) {
+                return [
+                    'fast' => collect([]),
+                    'moderate' => collect([]),
+                    'slow' => collect([])
+                ];
+            }
+
+            // Sort by total quantity in descending order
+            $sortedData = $stockOutData->sortByDesc('total_quantity');
+
+            // Calculate percentiles for classification
+            $fastThreshold = (int)($totalProducts * 0.2); // Top 20%
+            $moderateThreshold = (int)($totalProducts * 0.5); // Next 30%
+
+            // Classify products
+            $fastMoving = collect();
+            $moderateMoving = collect();
+            $slowMoving = collect();
+
+            foreach ($sortedData as $index => $item) {
+                $movementData = [
+                    'product_id' => $item->product_id,
+                    'product_name' => $item->product->name,
+                    'product_code' => $item->product->code,
+                    'total_quantity' => $item->total_quantity,
+                    'transaction_count' => $item->transaction_count,
+                    'average_per_month' => round($item->total_quantity / 3, 2) // 3 months period
+                ];
+
+                if ($index < $fastThreshold) {
+                    $fastMoving->push($movementData);
+                } elseif ($index < $moderateThreshold) {
+                    $moderateMoving->push($movementData);
+                } else {
+                    $slowMoving->push($movementData);
+                }
+            }
+
+            return [
+                'fast' => $fastMoving,
+                'moderate' => $moderateMoving,
+                'slow' => $slowMoving
+            ];
+        } catch (\Exception $e) {
+            \Log::error('Error in getProductMovementAnalysis: ' . $e->getMessage());
+            return [
+                'fast' => collect([]),
+                'moderate' => collect([]),
+                'slow' => collect([])
+            ];
         }
     }
 }
