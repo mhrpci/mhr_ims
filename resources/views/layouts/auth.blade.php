@@ -13,13 +13,33 @@
         body {
             background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
             min-height: 100vh;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
         }
+
+        .content-wrapper {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 60px 0;
+            overflow-y: auto;
+            width: 100%;
+        }
+
         .auth-card {
             background: #ffffff;
             border-radius: 0.75rem;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
             border: 1px solid rgba(0, 0, 0, 0.05);
+            width: 100%;
+            max-width: 400px; /* Set max-width instead of using col classes */
+            margin: 1rem;
         }
+
         .brand-logo {
             font-size: 2rem;
             color: #2d3748;
@@ -117,36 +137,151 @@
             color: #667eea;
             margin-top: 10px;
         }
+        .navbar {
+            background: rgba(255, 255, 255, 0.9) !important;
+            backdrop-filter: blur(10px);
+        }
+        
+        .navbar-brand {
+            font-size: 1.25rem;
+        }
+        
+        .nav-link {
+            color: #2d3748 !important;
+            font-weight: 500;
+            padding: 0.5rem 1rem !important;
+            transition: color 0.2s;
+        }
+        
+        .nav-link:hover {
+            color: #667eea !important;
+        }
+        .footer {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+            border-top: 1px solid rgba(0, 0, 0, 0.05);
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+        }
+
+        .footer .text-muted {
+            font-size: 0.9rem;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            body {
+                font-size: 14px;
+            }
+
+            .content-wrapper {
+                padding: 40px 15px;
+            }
+
+            .auth-card {
+                margin: 0.5rem;
+                padding: 1.5rem !important;
+            }
+
+            .brand-logo {
+                font-size: 1.5rem !important;
+            }
+
+            .brand-title {
+                font-size: 1.2rem !important;
+            }
+
+            .brand-subtitle {
+                font-size: 0.85rem !important;
+            }
+
+            .navbar {
+                padding: 0.5rem 1rem !important;
+            }
+
+            .navbar-brand {
+                font-size: 1.1rem !important;
+            }
+        }
+
+        /* Small screen adjustments */
+        @media (max-width: 480px) {
+            .content-wrapper {
+                padding: 30px 10px;
+            }
+
+            .auth-card {
+                margin: 0.25rem;
+                padding: 1rem !important;
+            }
+
+            .btn-primary {
+                padding: 0.5rem 1rem !important;
+            }
+
+            input {
+                padding: 0.5rem 0.75rem !important;
+            }
+        }
+
+        /* Height-based media query */
+        @media (max-height: 600px) {
+            .navbar, .footer {
+                height: 50px !important;
+            }
+
+            .content-wrapper {
+                padding: 20px 0;
+            }
+        }
     </style>
 </head>
-<body class="d-flex align-items-center py-4">
-    <!-- Preloader -->
-    <div class="preloader">
-        <div class="preloader-content">
-            <div class="inventory-icon">
-                <div class="inventory-box"></div>
-                <div class="inventory-box"></div>
-                <div class="inventory-box"></div>
-                <div class="inventory-box"></div>
+<body>
+    <!-- Update Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm fixed-top">
+        <div class="container">
+            <a class="navbar-brand d-flex align-items-center" href="#">
+                <i class="fas fa-boxes text-primary me-2"></i>
+                <span class="fw-bold">IMS</span>
+            </a>
+        </div>
+    </nav>
+
+    <!-- Update body class and add margin-top -->
+    <div class="d-flex align-items-center py-4" style="min-height: 100vh; margin-top: 60px;">
+        <!-- Preloader -->
+        <div class="preloader">
+            <div class="preloader-content">
+                <div class="inventory-icon">
+                    <div class="inventory-box"></div>
+                    <div class="inventory-box"></div>
+                    <div class="inventory-box"></div>
+                    <div class="inventory-box"></div>
+                </div>
+                <div class="loading-text">Loading Inventory System</div>
             </div>
-            <div class="loading-text">Loading Inventory System</div>
+        </div>
+
+        <div class="content-wrapper">
+            <div class="auth-card p-4">
+                <div class="text-center mb-4">
+                    <i class="fas fa-boxes brand-logo mb-3 text-primary"></i>
+                    <h1 class="h4 brand-title mb-2">IMS</h1>
+                    <p class="brand-subtitle mb-0">Inventory Management System</p>
+                </div>
+                @yield('content')
+            </div>
         </div>
     </div>
 
-    <main class="container">
-        <div class="row justify-content-center">
-            <div class="col-md-5 col-lg-4">
-                <div class="auth-card p-4">
-                    <div class="text-center mb-4">
-                        <i class="fas fa-boxes brand-logo mb-3 text-primary"></i>
-                        <h1 class="h4 brand-title mb-2">IMS</h1>
-                        <p class="brand-subtitle mb-0">Inventory Management System</p>
-                    </div>
-                    @yield('content')
-                </div>
-            </div>
+    <!-- Add Footer -->
+    <footer class="footer mt-auto py-3">
+        <div class="container text-center">
+            <span class="text-muted">© 2024 Inventory Management System. All rights reserved.</span>
         </div>
-    </main>
+    </footer>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {

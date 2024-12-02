@@ -154,7 +154,7 @@ class User extends Authenticatable
 
     public function canDeleteProduct()
     {
-        return $this->hasRole(['Admin', 'Super Admin', 'Branch Manager']);
+        return $this->hasRole(['Admin', 'Super Admin']);
     }
 
     public function canManageTool(Tool $tool = null)
@@ -186,7 +186,7 @@ class User extends Authenticatable
 
     public function canDeleteTool()
     {
-        return $this->hasRole(['Admin', 'Super Admin', 'Branch Manager']);
+        return $this->hasRole(['Admin', 'Super Admin']);
     }
 
     public function canManageInventory()
@@ -200,7 +200,7 @@ class User extends Authenticatable
 
     public function canDeleteInventory()
     {
-        return $this->hasRole(['Admin', 'Super Admin', 'Branch Manager']);
+        return $this->hasRole(['Admin', 'Super Admin']);
     }
 
     public function canManageBranches()
@@ -210,12 +210,12 @@ class User extends Authenticatable
 
     public function canManageVendors()
     {
-        return $this->hasRole(['Admin', 'Super Admin']);
+        return $this->hasRole(['Admin', 'Super Admin', 'Branch Manager']);
     }
 
     public function canManageCustomers()
     {
-        return $this->hasRole(['Admin', 'Super Admin']);
+        return $this->hasRole(['Admin', 'Super Admin', 'Branch Manager']);
     }
 
     public function canManageCategories()
@@ -255,5 +255,51 @@ class User extends Authenticatable
         return $this->hasRole(['Branch Manager', 'Admin', 'Super Admin']) &&
             ($this->hasRole(['Admin', 'Super Admin']) || 
              $this->branch_id === request()->stock_transfer->from_branch_id);
+    }
+
+    public function canManageReceivingReport(ReceivingReport $report = null)
+    {
+        if ($this->hasRole(['Admin', 'Super Admin'])) {
+            return true;
+        }
+
+        if ($this->hasRole(['Branch Manager', 'Stock Manager'])) {
+            if (!$report) {
+                return true; // Can create new reports for their branch
+            }
+            return $report->branch_id === $this->branch_id;
+        }
+
+        return false;
+    }
+
+    public function canAccess()
+    {
+        return $this->hasRole(['Admin', 'Super Admin', 'Branch Manager', 'Stock Manager']);
+    }
+
+    public function canAccessReceivingReports()
+    {
+        return $this->hasRole(['Admin', 'Super Admin']);
+    }
+
+    public function canAccessCreateReceivingReports()
+    {
+        return $this->hasRole(['Admin', 'Super Admin', 'Branch Manager', 'Stock Manager']);
+    }
+
+    public function canAccessEditReceivingReports()
+    {
+        return $this->hasRole(['Admin', 'Super Admin']);
+    }
+
+    public function canAccessDeleteReceivingReports()
+    {
+        return $this->hasRole(['Admin', 'Super Admin']);
+    }
+
+    public function canAccessBranches()
+    {
+        return $this->hasRole(['Admin', 'Super Admin']);
     }
 }

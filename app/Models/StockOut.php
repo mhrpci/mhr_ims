@@ -9,7 +9,22 @@ class StockOut extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['product_id', 'customer_id', 'branch_id', 'quantity', 'unit_price', 'total_price', 'date', 'transfer_request_id', 'created_by', 'updated_by'];
+    protected $fillable = [
+        'stock_out_number',
+        'product_id',
+        'stock_in_id',
+        'customer_id',
+        'branch_id',
+        'quantity',
+        'unit',
+        'note',
+        'unit_price',
+        'total_price',
+        'date',
+        'transfer_request_id',
+        'created_by',
+        'updated_by'
+    ];
 
     protected $casts = [
         'date' => 'datetime',
@@ -50,5 +65,10 @@ class StockOut extends Model
     public function updater()
     {
         return $this->belongsTo(User::class, 'updated_by')->select(['id', 'username']);
+    }
+
+    public function stockIn()
+    {
+        return $this->belongsTo(StockIn::class);
     }
 }

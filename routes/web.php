@@ -20,6 +20,7 @@ use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\BarcodeController;
 use App\Http\Controllers\StockTransferController;
 use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\ReceivingReportController;
 
 /*
 |--------------------------------------------------------------------------
@@ -119,15 +120,15 @@ Route::middleware(['auth'])->group(function () {
         abort(500, 'Registration is currently disabled.');
     })->name('register');
 
-    Route::post('notifications/{notification}/mark-as-read', function ($notification) {
-        auth()->user()->notifications()->findOrFail($notification)->markAsRead();
-        return response()->json(['success' => true]);
-    })->name('notifications.mark-as-read');
+    // Route::post('notifications/{notification}/mark-as-read', function ($notification) {
+    //     auth()->user()->notifications()->findOrFail($notification)->markAsRead();
+    //     return response()->json(['success' => true]);
+    // })->name('notifications.mark-as-read');
 
-    Route::post('notifications/mark-as-read/{notification}', 'NotificationController@markAsRead')
-        ->name('notifications.mark-as-read');
-    Route::post('notifications/mark-all-read', 'NotificationController@markAllAsRead')
-        ->name('notifications.mark-all-read');
+    // Route::post('notifications/mark-as-read/{notification}', 'NotificationController@markAsRead')
+    //     ->name('notifications.mark-as-read');
+    // Route::post('notifications/mark-all-read', 'NotificationController@markAllAsRead')
+    //     ->name('notifications.mark-all-read');
 
     // Notification routes
     Route::post('notifications/{id}/mark-as-read', [NotificationController::class, 'markAsRead'])
@@ -141,6 +142,8 @@ Route::middleware(['auth'])->group(function () {
 
     Route::get('products/export', [ProductController::class, 'export'])->name('products.export');
     Route::post('products/import', [ProductController::class, 'import'])->name('products.import');
+
+    Route::resource('receiving-reports', ReceivingReportController::class);
 
 });
 

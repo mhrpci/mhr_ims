@@ -22,6 +22,10 @@
                         <table class="table table-borderless">
                             <tbody>
                                 <tr>
+                                    <th scope="row" class="text-muted">Stock Out Number:</th>
+                                    <td>{{ $stockOut->stock_out_number }}</td>
+                                </tr>
+                                <tr>
                                     <th scope="row" class="text-muted">Product:</th>
                                     <td>{{ $stockOut->product->name }}</td>
                                 </tr>
@@ -35,15 +39,11 @@
                                 </tr>
                                 <tr>
                                     <th scope="row" class="text-muted">Quantity:</th>
-                                    <td>{{ $stockOut->quantity }}</td>
+                                    <td>{{ $stockOut->quantity }} {{ $stockOut->unit }}</td>
                                 </tr>
                                 <tr>
-                                    <th scope="row" class="text-muted">Unit Price:</th>
-                                    <td>{{ number_format($stockOut->unit_price, 2) }}</td>
-                                </tr>
-                                <tr>
-                                    <th scope="row" class="text-muted">Total Price:</th>
-                                    <td>{{ number_format($stockOut->total_price, 2) }}</td>
+                                    <th scope="row" class="text-muted">Note:</th>
+                                    <td>{{ $stockOut->note ?? 'N/A' }}</td>
                                 </tr>
                                 <tr>
                                     <th scope="row" class="text-muted">Date:</th>

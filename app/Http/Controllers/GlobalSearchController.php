@@ -12,6 +12,7 @@ use App\Models\Tool;
 use App\Models\StockIn;
 use App\Models\StockOut;
 use App\Models\Inventory;
+use App\Models\ReceivingReport;
 use Illuminate\Support\Facades\Log;
 
 class GlobalSearchController extends Controller
@@ -20,6 +21,9 @@ class GlobalSearchController extends Controller
     {
         $query = $request->input('query');
         $results = [];
+
+        // Get user's branch_id
+        $userBranchId = auth()->user()->branch_id;
 
         if (strlen($query) >= 1) {
             $results = array_merge(
@@ -31,7 +35,8 @@ class GlobalSearchController extends Controller
                 $this->searchTools($query),
                 $this->searchStockIns($query),
                 $this->searchStockOuts($query),
-                $this->searchInventories($query)
+                $this->searchInventories($query),
+                $this->searchReceivingReports($query)
             );
 
             usort($results, function($a, $b) use ($query) {
@@ -179,52 +184,54 @@ class GlobalSearchController extends Controller
 
     private function searchStockIns($query)
     {
-        return StockIn::whereHas('product', function($q) use ($query) {
-                $q->where('name', 'like', "%$query%");
-            })
-            ->orWhereHas('vendor', function($q) use ($query) {
-                $q->where('name', 'like', "%$query%");
-            })
-            ->orWhereHas('branch', function($q) use ($query) {
-                $q->where('name', 'like', "%$query%");
-            })
-            ->limit(5)
-            ->get()
-            ->map(function($stockIn) {
-                return [
-                    'id' => 'stockin_' . $stockIn->id,
-                    'text' => "Stock In: {$stockIn->product->name}",
-                    'subtext' => "Quantity: {$stockIn->quantity}, Date: {$stockIn->date->format('Y-m-d')}, Branch: {$stockIn->branch->name}",
-                    'model' => 'Stock In',
-                    'url' => route('stock_ins.show', $stockIn->id)
-                ];
-            })
-            ->toArray();
+        return StockIn::where('lot_number', 'like', "%$query%")
+                ->orWhereHas('product', function($q) use ($query) {
+                    $q->where('name', 'like', "%$query%");
+                })
+                ->orWhereHas('vendor', function($q) use ($query) {
+                    $q->where('name', 'like', "%$query%");
+                })
+                ->orWhereHas('branch', function($q) use ($query) {
+                    $q->where('name', 'like', "%$query%");
+                })
+                ->limit(5)
+                ->get()
+                ->map(function($stockIn) {
+                    return [
+                        'id' => 'stockin_' . $stockIn->id,
+                        'text' => "Stock In: {$stockIn->product->name}",
+                        'subtext' => "Lot #: {$stockIn->lot_number}, Quantity: {$stockIn->quantity}, Date: {$stockIn->date->format('Y-m-d')}, Branch: {$stockIn->branch->name}",
+                        'model' => 'Stock In',
+                        'url' => route('stock_ins.show', $stockIn->id)
+                    ];
+                })
+                ->toArray();
     }
 
     private function searchStockOuts($query)
     {
-        return StockOut::whereHas('product', function($q) use ($query) {
-                $q->where('name', 'like', "%$query%");
-            })
-            ->orWhereHas('customer', function($q) use ($query) {
-                $q->where('name', 'like', "%$query%");
-            })
-            ->orWhereHas('branch', function($q) use ($query) {
-                $q->where('name', 'like', "%$query%");
-            })
-            ->limit(5)
-            ->get()
-            ->map(function($stockOut) {
-                return [
-                    'id' => 'stockout_' . $stockOut->id,
-                    'text' => "Stock Out: {$stockOut->product->name}",
-                    'subtext' => "Quantity: {$stockOut->quantity}, Date: {$stockOut->date->format('Y-m-d')}, Branch: {$stockOut->branch->name}",
-                    'model' => 'Stock Out',
-                    'url' => route('stock_outs.show', $stockOut->id)
-                ];
-            })
-            ->toArray();
+        return StockOut::where('stock_out_number', 'like', "%$query%")
+                ->orWhereHas('product', function($q) use ($query) {
+                    $q->where('name', 'like', "%$query%");
+                })
+                ->orWhereHas('customer', function($q) use ($query) {
+                    $q->where('name', 'like', "%$query%");
+                })
+                ->orWhereHas('branch', function($q) use ($query) {
+                    $q->where('name', 'like', "%$query%");
+                })
+                ->limit(5)
+                ->get()
+                ->map(function($stockOut) {
+                    return [
+                        'id' => 'stockout_' . $stockOut->id,
+                        'text' => "Stock Out: {$stockOut->product->name}",
+                        'subtext' => "Stock Out #: {$stockOut->stock_out_number}, Quantity: {$stockOut->quantity}, Date: {$stockOut->date->format('Y-m-d')}, Branch: {$stockOut->branch->name}",
+                        'model' => 'Stock Out',
+                        'url' => route('stock_outs.show', $stockOut->id)
+                    ];
+                })
+                ->toArray();
     }
 
     private function searchInventories($query)
@@ -244,6 +251,46 @@ class GlobalSearchController extends Controller
                     'subtext' => "Quantity: {$inventory->quantity} | Last updated: {$inventory->updated_at->format('Y-m-d H:i')}",
                     'model' => 'Inventory',
                     'url' => route('inventories.show', $inventory->id)
+                ];
+            })
+            ->toArray();
+    }
+
+    private function searchReceivingReports($query)
+    {
+        $receivingReports = ReceivingReport::where(function($q) use ($query) {
+            $q->where('receiving_report_number', 'like', "%$query%")
+              ->orWhere('item_code', 'like', "%$query%")
+              ->orWhere('name', 'like', "%$query%")
+              ->orWhere('barcode', 'like', "%$query%");
+        })
+        ->orWhereHas('vendor', function($q) use ($query) {
+            $q->where('name', 'like', "%$query%");
+        })
+        ->orWhereHas('branch', function($q) use ($query) {
+            $q->where('name', 'like', "%$query%");
+        })
+        ->orWhereHas('category', function($q) use ($query) {
+            $q->where('name', 'like', "%$query%");
+        });
+
+        // Filter by user's branch if they have one assigned
+        if (auth()->user()->branch_id) {
+            $receivingReports->where('branch_id', auth()->user()->branch_id);
+        }
+
+        return $receivingReports->limit(5)
+            ->get()
+            ->map(function($report) {
+                return [
+                    'id' => 'receiving_report_' . $report->id,
+                    'text' => "RR#{$report->receiving_report_number}: {$report->name}",
+                    'subtext' => "Item Code: {$report->item_code} | " .
+                                "Quantity: {$report->quantity} {$report->unit} | " .
+                                "Date: {$report->date_received->format('Y-m-d')} | " .
+                                "Branch: {$report->branch->name}",
+                    'model' => 'Receiving Report',
+                    'url' => route('receiving-reports.show', $report->id)
                 ];
             })
             ->toArray();

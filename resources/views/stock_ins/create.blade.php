@@ -86,6 +86,47 @@
                         @enderror
                     </div>
                 </div>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="unit" class="form-label">Unit <span class="text-danger">*</span></label>
+                        <input type="text" name="unit" id="unit" class="form-control @error('unit') is-invalid @enderror" value="{{ old('unit') }}" required>
+                        @error('unit')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="lot_number" class="form-label">Lot Number <span class="text-danger">*</span></label>
+                        <input type="text" name="lot_number" id="lot_number" class="form-control @error('lot_number') is-invalid @enderror" value="{{ old('lot_number') }}" required>
+                        @error('lot_number')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="expiration_date" class="form-label">Expiration Date</label>
+                        <input type="date" name="expiration_date" id="expiration_date" class="form-control @error('expiration_date') is-invalid @enderror" value="{{ old('expiration_date') }}">
+                        @error('expiration_date')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="unit_price" class="form-label">Unit Price</label>
+                        <input type="number" step="0.01" name="unit_price" id="unit_price" class="form-control @error('unit_price') is-invalid @enderror" value="{{ old('unit_price') }}">
+                        @error('unit_price')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12 mb-3">
+                        <label for="note" class="form-label">Note</label>
+                        <textarea name="note" id="note" class="form-control @error('note') is-invalid @enderror">{{ old('note') }}</textarea>
+                        @error('note')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+                </div>
                 <div class="mt-4 text-end">
                     <button type="submit" name="action" value="save" class="btn btn-primary">
                         <i class="bi bi-plus-circle me-2"></i>Create Stock In

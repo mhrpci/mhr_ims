@@ -28,13 +28,12 @@
                 <table class="table datatable">
                     <thead>
                         <tr>
-                            <th>ID</th>
+                            <th>Stock Out #</th>
                             <th>Product</th>
                             <th>Customer</th>
                             <th>Branch</th>
                             <th>Quantity</th>
-                            <th>Unit Price</th>
-                            <th>Total Price</th>
+                            <th>Unit</th>
                             <th>Date</th>
                             <th>Actions</th>
                         </tr>
@@ -42,13 +41,12 @@
                     <tbody>
                         @foreach($stockOuts as $stockOut)
                         <tr>
-                            <td>{{ $stockOut->id }}</td>
+                            <td>{{ $stockOut->stock_out_number }}</td>
                             <td>{{ $stockOut->product->name }}</td>
                             <td>{{ $stockOut->customer->name ?? 'N/A' }}</td>
                             <td>{{ $stockOut->branch->name }}</td>
-                            <td>{{ $stockOut->quantity }}</td>
-                            <td>{{ number_format($stockOut->unit_price, 2) }}</td>
-                            <td>{{ number_format($stockOut->total_price, 2) }}</td>
+                            <td>{{ $stockOut->quantity }} {{ $stockOut->unit }}</td>
+                            <td>{{ $stockOut->unit }}</td>
                             <td>{{ $stockOut->date instanceof \DateTime ? $stockOut->date->format('Y-m-d') : $stockOut->date }}</td>
                             <td>
                                 <a href="{{ route('stock_outs.show', $stockOut) }}" class="btn btn-sm btn-info" title="Preview">

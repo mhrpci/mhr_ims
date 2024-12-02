@@ -26,6 +26,15 @@
                 @csrf
                 <div class="row">
                     <div class="col-md-6 mb-3">
+                        <label for="stock_out_number" class="form-label">Stock Out Number / SI#</label>
+                        <input type="text" name="stock_out_number" id="stock_out_number" class="form-control @error('stock_out_number') is-invalid @enderror" value="{{ old('stock_out_number') }}">
+                        @error('stock_out_number')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
                         <label for="product_id" class="form-label">Product <span class="text-danger">*</span></label>
                         <select class="form-select @error('product_id') is-invalid @enderror" name="product_id" id="product_id" required>
                             <option value="">Select Product</option>
@@ -73,6 +82,29 @@
                         <label for="quantity" class="form-label">Quantity <span class="text-danger">*</span></label>
                         <input type="number" name="quantity" id="quantity" class="form-control @error('quantity') is-invalid @enderror" value="{{ old('quantity') }}" required min="1">
                         @error('quantity')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="unit" class="form-label">Unit <span class="text-danger">*</span></label>
+                        <input type="text" name="unit" id="unit" class="form-control @error('unit') is-invalid @enderror" value="{{ old('unit') }}" required>
+                        @error('unit')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="unit_price" class="form-label">Unit Price</label>
+                        <input type="number" step="0.01" name="unit_price" id="unit_price" class="form-control @error('unit_price') is-invalid @enderror" value="{{ old('unit_price') }}">
+                        @error('unit_price')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="note" class="form-label">Note</label>
+                        <textarea name="note" id="note" class="form-control @error('note') is-invalid @enderror">{{ old('note') }}</textarea>
+                        @error('note')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
                     </div>

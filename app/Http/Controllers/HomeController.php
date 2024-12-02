@@ -42,6 +42,8 @@ class HomeController extends Controller
                 'userDistribution' => $this->getUserDistribution($user),
                 'recentInventoryMovements' => $this->getRecentInventoryMovements($user),
                 'totalTools' => $this->getTotalTools($user),
+                'nearExpiryProducts' => $this->getNearExpiryProducts($user),
+                'nearExpiryCount' => $this->getNearExpiryCount($user),
             ];
 
             return view('home', $data);
@@ -536,6 +538,60 @@ class HomeController extends Controller
 
         try {
             return \App\Models\Tool::count();
+        } catch (\Exception $e) {
+            return 0;
+        }
+    }
+
+    private function getNearExpiryProducts($user)
+    {
+        if (!$user) return collect([]);
+
+        try {
+            $warningDays = 90; // Configure how many days in advance to show warning
+            $today = Carbon::now();
+
+            $query = StockIn::with(['product'])
+                ->whereNotNull('expiration_date')
+                ->whereNotNull('lot_number')
+                ->whereRaw('quantity > 0')
+                ->where('expiration_date', '>', $today)
+                ->where('expiration_date', '<=', $today->copy()->addDays($warningDays))
+                ->orderBy('expiration_date');
+
+            if ($user->isBranchRestricted()) {
+                $query->where('branch_id', $user->branch_id);
+            }
+
+            return $query->get()->map(function ($item) use ($today) {
+                $item->days_until_expiry = $today->diffInDays($item->expiration_date);
+                return $item;
+            });
+        } catch (\Exception $e) {
+            \Log::error('Error in getNearExpiryProducts: ' . $e->getMessage());
+            return collect([]);
+        }
+    }
+
+    private function getNearExpiryCount($user)
+    {
+        if (!$user) return 0;
+
+        try {
+            $warningDays = 90;
+            $today = Carbon::now();
+
+            $query = StockIn::whereNotNull('expiration_date')
+                ->whereNotNull('lot_number')
+                ->whereRaw('quantity > 0')
+                ->where('expiration_date', '>', $today)
+                ->where('expiration_date', '<=', $today->copy()->addDays($warningDays));
+
+            if ($user->isBranchRestricted()) {
+                $query->where('branch_id', $user->branch_id);
+            }
+
+            return $query->count();
         } catch (\Exception $e) {
             return 0;
         }

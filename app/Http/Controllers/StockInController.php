@@ -63,9 +63,19 @@ class StockInController extends Controller
                 },
             ],
             'quantity' => 'required|integer|min:1',
+            'unit' => 'required|string',
+            'lot_number' => 'required|string|unique:stock_ins,lot_number',
+            'expiration_date' => 'nullable|date',
+            'note' => 'nullable|string',
+            'unit_price' => 'nullable|numeric|min:0',
+            'total_price' => 'nullable|numeric|min:0',
             'date' => 'required|date',
         ]);
 
+        // Calculate total price if unit price is provided
+        if ($request->filled('unit_price')) {
+            $validatedData['total_price'] = $validatedData['unit_price'] * $validatedData['quantity'];
+        }
 
         $validatedData['created_by'] = $user->id;
         $validatedData['updated_by'] = $user->id;

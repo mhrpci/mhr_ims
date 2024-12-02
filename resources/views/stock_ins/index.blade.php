@@ -33,8 +33,9 @@
                             <th>Vendor</th>
                             <th>Branch</th>
                             <th>Quantity</th>
-                            <th>Unit Price</th>
-                            <th>Total Price</th>
+                            <th>Unit</th>
+                            <th>Lot Number</th>
+                            <th>Expiration</th>
                             <th>Date</th>
                             <th>Actions</th>
                         </tr>
@@ -46,9 +47,10 @@
                             <td>{{ $stockIn->product->name }}</td>
                             <td>{{ $stockIn->vendor->name ?? 'N/A' }}</td>
                             <td>{{ $stockIn->branch->name }}</td>
-                            <td>{{ $stockIn->quantity }}</td>
-                            <td>{{ number_format($stockIn->unit_price, 2) }}</td>
-                            <td>{{ number_format($stockIn->total_price, 2) }}</td>
+                            <td>{{ $stockIn->quantity }} {{ $stockIn->unit }}</td>
+                            <td>{{ $stockIn->unit }}</td>
+                            <td>{{ $stockIn->lot_number }}</td>
+                            <td>{{ $stockIn->expiration_date ? $stockIn->expiration_date->format('Y-m-d') : 'N/A' }}</td>
                             <td>{{ $stockIn->date instanceof \DateTime ? $stockIn->date->format('Y-m-d') : $stockIn->date }}</td>
                             <td>
                                 <a href="{{ route('stock_ins.show', $stockIn) }}" class="btn btn-sm btn-info" title="Preview">

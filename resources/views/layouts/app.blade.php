@@ -22,6 +22,7 @@
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
     <link href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" rel="stylesheet" />
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
 </head>
 <body>
     <!-- Add the preloader HTML structure -->
@@ -93,7 +94,13 @@
                         <span class="d-none d-lg-inline">{{ __('Stock Transfer') }}</span>
                     </a>
                 </li>
-                @if(Auth::user()->hasRole(['Admin', 'Super Admin']))
+                <li class="nav-item">
+                    <a class="nav-link {{ Request::is('receiving-reports*') ? 'active' : '' }}" href="{{ route('receiving-reports.index')}}">
+                        <i class="bi bi-file-earmark-check me-2"></i>
+                        <span class="d-none d-lg-inline">{{ __('Receiving Reports') }}</span>
+                    </a>
+                </li>
+                @if(Auth::user()->canAccess())
                 <li class="nav-item">
                     <a class="nav-link {{ Request::is('customers*') ? 'active' : '' }}" href="{{ route('customers.index') }}">
                         <i class="bi bi-people me-2"></i>
@@ -106,6 +113,8 @@
                         <span class="d-none d-lg-inline">{{ __('Vendors') }}</span>
                     </a>
                 </li>
+                @endif
+                @if(Auth::user()->canAccessBranches())
                 <li class="nav-item">
                     <a class="nav-link {{ Request::is('branches*') ? 'active' : '' }}" href="{{ route('branches.index')}}">
                         <i class="bi bi-building me-2"></i>

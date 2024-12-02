@@ -13,10 +13,13 @@ return new class extends Migration
     {
         Schema::create('stock_outs', function (Blueprint $table) {
             $table->id();
+            $table->string('stock_out_number');
             $table->foreignId('product_id')->constrained()->cascadeOnDelete();
             $table->string('customer_id')->nullable();
             $table->foreignId('branch_id')->constrained()->cascadeOnDelete();
             $table->integer('quantity');
+            $table->string('unit');
+            $table->string('note')->nullable();
             $table->decimal('unit_price', 10, 2)->nullable();
             $table->decimal('total_price', 10, 2)->nullable();
             $table->date('date');

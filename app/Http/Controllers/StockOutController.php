@@ -52,6 +52,7 @@ class StockOutController extends Controller
         $user = Auth::user();
 
         $validatedData = $request->validate([
+            'stock_out_number' => 'nullable|string',
             'product_id' => 'required|exists:products,id',
             'customer_id' => 'nullable',
             'branch_id' => [
@@ -64,11 +65,25 @@ class StockOutController extends Controller
                 },
             ],
             'quantity' => 'required|integer|min:1',
+            'unit' => 'required|string',
+            'note' => 'nullable|string',
+            'unit_price' => 'nullable|numeric|min:0',
+            'total_price' => 'nullable|numeric|min:0',
             'date' => 'required|date',
         ]);
 
         $validatedData['created_by'] = $user->id;
         $validatedData['updated_by'] = $user->id;
+        
+        // Generate stock out number only if not provided
+        if (empty($validatedData['stock_out_number'])) {
+            $validatedData['stock_out_number'] = 'SO-' . date('Ymd') . '-' . rand(1000, 9999);
+        }
+
+        // Calculate total price if unit price is provided
+        if ($validatedData['unit_price']) {
+            $validatedData['total_price'] = $validatedData['unit_price'] * $validatedData['quantity'];
+        }
 
         $inventory = Inventory::where('product_id', $validatedData['product_id'])
             ->where('branch_id', $validatedData['branch_id'])

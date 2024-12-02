@@ -35,15 +35,19 @@
                                 </tr>
                                 <tr>
                                     <th scope="row" class="text-muted">Quantity:</th>
-                                    <td>{{ $stockIn->quantity }}</td>
+                                    <td>{{ $stockIn->quantity }} {{ $stockIn->unit }}</td>
                                 </tr>
                                 <tr>
-                                    <th scope="row" class="text-muted">Unit Price:</th>
-                                    <td>{{ number_format($stockIn->unit_price, 2) }}</td>
+                                    <th scope="row" class="text-muted">Lot Number:</th>
+                                    <td>{{ $stockIn->lot_number }}</td>
                                 </tr>
                                 <tr>
-                                    <th scope="row" class="text-muted">Total Price:</th>
-                                    <td>{{ number_format($stockIn->total_price, 2) }}</td>
+                                    <th scope="row" class="text-muted">Expiration Date:</th>
+                                    <td>{{ $stockIn->expiration_date ? $stockIn->expiration_date->format('F d, Y') : 'N/A' }}</td>
+                                </tr>
+                                <tr>
+                                    <th scope="row" class="text-muted">Note:</th>
+                                    <td>{{ $stockIn->note ?? 'N/A' }}</td>
                                 </tr>
                                 <tr>
                                     <th scope="row" class="text-muted">Date:</th>

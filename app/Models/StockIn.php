@@ -9,10 +9,26 @@ class StockIn extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['product_id', 'vendor_id', 'branch_id', 'quantity', 'unit_price', 'total_price', 'date', 'transfer_request_id', 'created_by', 'updated_by'];
+    protected $fillable = [
+        'product_id', 
+        'vendor_id', 
+        'branch_id', 
+        'quantity',
+        'unit',
+        'lot_number',
+        'expiration_date', 
+        'note',
+        'unit_price', 
+        'total_price', 
+        'date', 
+        'transfer_request_id', 
+        'created_by', 
+        'updated_by'
+    ];
 
     protected $casts = [
         'date' => 'date',
+        'expiration_date' => 'date',
     ];
 
     public function product()

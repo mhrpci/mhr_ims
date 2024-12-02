@@ -137,6 +137,17 @@
             </div>
         </div>
         @endif
+        <div class="col-md-3 col-sm-6">
+            <div class="card bg-warning text-dark h-100 shadow-sm">
+                <div class="card-body d-flex flex-column justify-content-between">
+                    <h5 class="card-title fw-light">Near Expiry Products</h5>
+                    <div class="d-flex align-items-center">
+                        <i class="bi bi-exclamation-triangle fs-1 me-3"></i>
+                        <h2 class="card-text mb-0 fw-bold">{{ $nearExpiryCount }}</h2>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <div class="row mt-4 g-4">
@@ -164,7 +175,7 @@
         @endif
     </div>
 
-    <div class="row mt-4">
+    <div class="row mt-4 g-4">
         <div class="col-12">
             <div class="card shadow-sm">
                 <div class="card-header bg-light d-flex justify-content-between align-items-center">
@@ -245,6 +256,48 @@
                                         <small class="text-muted">
                                             {{ \Carbon\Carbon::parse($movement->created_at)->format('M d, Y H:i') }}
                                         </small>
+                                    </td>
+                                </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mt-4 g-4">
+        <div class="col-12">
+            <div class="card shadow-sm">
+                <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                    <h5 class="card-title mb-0">Products Near Expiration</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Product</th>
+                                    <th>Lot Number</th>
+                                    <th>Quantity</th>
+                                    <th>Expiration Date</th>
+                                    <th>Days Until Expiry</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach($nearExpiryProducts as $product)
+                                <tr>
+                                    <td>{{ $product->product->name }}</td>
+                                    <td>{{ $product->lot_number }}</td>
+                                    <td>{{ number_format($product->quantity) }} {{ $product->unit }}</td>
+                                    <td>{{ $product->expiration_date->format('M d, Y') }}</td>
+                                    <td>{{ $product->days_until_expiry }} days</td>
+                                    <td>
+                                        <span class="badge bg-{{ $product->days_until_expiry <= 30 ? 'danger' : 'warning' }}">
+                                            {{ $product->days_until_expiry <= 30 ? 'Critical' : 'Warning' }}
+                                        </span>
                                     </td>
                                 </tr>
                                 @endforeach
