@@ -302,4 +302,9 @@ class User extends Authenticatable
     {
         return $this->hasRole(['Admin', 'Super Admin']);
     }
+
+    public function canAccessStockTransfers()
+    {
+        return $this->hasRole(['Admin', 'Super Admin','Stock Manager']);
+    }
 }

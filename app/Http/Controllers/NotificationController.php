@@ -8,6 +8,7 @@ use App\Models\User;
 use App\Notifications\StockTransferApprovedNotification;
 use App\Notifications\StockTransferRejectedNotification;
 use App\Notifications\StockTransferRequestNotification;
+use App\Notifications\NearExpiryNotification;
 
 class NotificationController extends Controller
 {
@@ -21,20 +22,14 @@ class NotificationController extends Controller
         $notification = Auth::user()->notifications()->findOrFail($id);
         $notification->markAsRead();
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Notification marked as read'
-        ]);
+        return back()->with('success', 'Notification marked as read');
     }
 
     public function markAllAsRead()
     {
         Auth::user()->unreadNotifications->markAsRead();
 
-        return response()->json([
-            'success' => true,
-            'message' => 'All notifications marked as read'
-        ]);
+        return back()->with('success', 'All notifications marked as read');
     }
 
     public function index()
@@ -91,4 +86,5 @@ class NotificationController extends Controller
             $admin->notify(new StockTransferRequestNotification($stockTransfer));
         }
     }
+
 }

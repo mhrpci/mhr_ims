@@ -16,9 +16,11 @@
             <h1 class="h3 mb-0 text-gray-800">Stock Transfer Management</h1>
         </div>
         <div class="col-auto">
+            @if(auth()->user()->canAccessStockTransfers())
             <a href="{{ route('stock_transfers.create') }}" class="btn btn-primary">
                 <i class="bi bi-plus-circle me-2"></i>Create New Transfer
             </a>
+            @endif
         </div>
     </div>
 

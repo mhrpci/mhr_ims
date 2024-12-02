@@ -11,6 +11,7 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Cache;
 
 class HomeController extends Controller
 {
@@ -28,24 +29,30 @@ class HomeController extends Controller
         }
 
         try {
-            $data = [
-                'totalProducts' => $this->getTotalProducts($user),
-                'totalBranches' => $this->getTotalBranches($user),
-                'totalUsers' => $this->getTotalUsers($user),
-                'totalCategories' => $this->getTotalCategories($user),
-                'totalVendors' => $this->getTotalVendors($user),
-                'totalCustomers' => $this->getTotalCustomers($user),
-                'availableProducts' => $this->getAvailableProducts($user),
-                'stockInThisMonth' => $this->getStockInThisMonth($user),
-                'stockOutThisMonth' => $this->getStockOutThisMonth($user),
-                'inventoryTrends' => $this->getInventoryTrends($user),
-                'userDistribution' => $this->getUserDistribution($user),
-                'recentInventoryMovements' => $this->getRecentInventoryMovements($user),
-                'totalTools' => $this->getTotalTools($user),
-                'nearExpiryProducts' => $this->getNearExpiryProducts($user),
-                'nearExpiryCount' => $this->getNearExpiryCount($user),
-                'productMovement' => $this->getProductMovementAnalysis($user),
-            ];
+            // Cache key unique to each user
+            $cacheKey = "dashboard_data_user_{$user->id}";
+            
+            // Cache for 5 minutes (adjust duration as needed)
+            $data = Cache::remember($cacheKey, 300, function () use ($user) {
+                return [
+                    'totalProducts' => $this->getTotalProducts($user),
+                    'totalBranches' => $this->getTotalBranches($user),
+                    'totalUsers' => $this->getTotalUsers($user),
+                    'totalCategories' => $this->getTotalCategories($user),
+                    'totalVendors' => $this->getTotalVendors($user),
+                    'totalCustomers' => $this->getTotalCustomers($user),
+                    'availableProducts' => $this->getAvailableProducts($user),
+                    'stockInThisMonth' => $this->getStockInThisMonth($user),
+                    'stockOutThisMonth' => $this->getStockOutThisMonth($user),
+                    'inventoryTrends' => $this->getInventoryTrends($user),
+                    'userDistribution' => $this->getUserDistribution($user),
+                    'recentInventoryMovements' => $this->getRecentInventoryMovements($user),
+                    'totalTools' => $this->getTotalTools($user),
+                    'nearExpiryProducts' => $this->getNearExpiryProducts($user),
+                    'nearExpiryCount' => $this->getNearExpiryCount($user),
+                    'productMovement' => $this->getProductMovementAnalysis($user),
+                ];
+            });
 
             return view('home', $data);
         } catch (\Exception $e) {
@@ -551,6 +558,7 @@ class HomeController extends Controller
         try {
             $warningDays = 90; // Configure how many days in advance to show warning
             $today = Carbon::now();
+            $notificationThresholds = [90, 60, 30, 15, 7]; // Days before expiry to send notifications
 
             $query = StockIn::with(['product'])
                 ->whereNotNull('expiration_date')
@@ -564,7 +572,18 @@ class HomeController extends Controller
                 $query->where('branch_id', $user->branch_id);
             }
 
-            return $query->get()->map(function ($item) use ($today) {
+            $nearExpiryProducts = $query->get();
+
+            // Send notifications for products reaching threshold days
+            foreach ($nearExpiryProducts as $stockIn) {
+                $daysUntilExpiry = $today->diffInDays($stockIn->expiration_date);
+                
+                if (in_array($daysUntilExpiry, $notificationThresholds)) {
+                    app(NotificationController::class)->sendNearExpiryNotification($stockIn);
+                }
+            }
+
+            return $nearExpiryProducts->map(function ($item) use ($today) {
                 $item->days_until_expiry = $today->diffInDays($item->expiration_date);
                 return $item;
             });
