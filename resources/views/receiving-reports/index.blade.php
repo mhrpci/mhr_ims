@@ -15,6 +15,18 @@
         </div>
     </div>
 
+    <!-- Date Range Filter -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <label for="startDateFilter" class="form-label">Start Date</label>
+            <input type="date" id="startDateFilter" class="form-control" placeholder="Start Date" autocomplete="off">
+        </div>
+        <div class="col-md-3">
+            <label for="endDateFilter" class="form-label">End Date</label>
+            <input type="date" id="endDateFilter" class="form-control" placeholder="End Date" autocomplete="off">
+        </div>
+    </div>
+
     @if(session('success'))
         <div class="alert alert-success alert-dismissible fade show" role="alert">
             {{ session('success') }}
@@ -25,7 +37,7 @@
     <div class="card shadow mb-4">
         <div class="card-body">
             <div class="table-responsive">
-                <table class="table datatable">
+                <table class="table datatable" id="receivingReportsTable">
                     <thead>
                         <tr>
                             <th>Report Number</th>
@@ -77,4 +89,51 @@
         border-bottom: 1px solid #e3e6f0;
     }
 </style>
+@endpush
+
+@push('scripts')
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
+<script>
+    $(document).ready(function() {
+        // Destroy existing DataTable if it exists
+        if ($.fn.DataTable.isDataTable('#receivingReportsTable')) {
+            $('#receivingReportsTable').DataTable().destroy();
+        }
+
+        // Initialize DataTable with specific date sorting
+        var table = $('#receivingReportsTable').DataTable({
+            columnDefs: [
+                {
+                    targets: 1, // Date column index
+                    type: 'date'
+                }
+            ],
+            order: [[1, 'desc']], // Sort by date column descending by default
+        });
+
+        // Remove any existing search function before adding new one
+        $.fn.dataTable.ext.search.pop();
+
+        // Custom filtering function for date range
+        $.fn.dataTable.ext.search.push(
+            function(settings, data, dataIndex) {
+                var startDate = $('#startDateFilter').val();
+                var endDate = $('#endDateFilter').val();
+                var dateReceived = moment(data[1], 'MMM DD, YYYY').format('YYYY-MM-DD'); // Convert displayed date to YYYY-MM-DD
+
+                if (startDate === '' && endDate === '') return true;
+                if (startDate === '' && dateReceived <= endDate) return true;
+                if (endDate === '' && dateReceived >= startDate) return true;
+                if (dateReceived >= startDate && dateReceived <= endDate) return true;
+                
+                return false;
+            }
+        );
+
+        // Event listener for date inputs
+        $('#startDateFilter, #endDateFilter').on('change', function() {
+            table.draw();
+        });
+    });
+</script>
 @endpush 

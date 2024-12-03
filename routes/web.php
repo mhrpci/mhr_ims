@@ -145,6 +145,9 @@ Route::middleware(['auth'])->group(function () {
 
     Route::resource('receiving-reports', ReceivingReportController::class);
 
+    Route::get('/near-expiry-products', [HomeController::class, 'allNearExpiryProducts'])->name('near.expiry.products');
+    Route::get('/product-movement-analysis', [HomeController::class, 'allProductMovementAnalysis'])->name('product.movement.analysis');
+
 });
 
 Auth::routes();

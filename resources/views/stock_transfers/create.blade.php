@@ -39,6 +39,9 @@
                             @foreach($inventories as $inventory)
                                 <option value="{{ $inventory->id }}" {{ old('inventory_id') == $inventory->id ? 'selected' : '' }}>
                                     {{ $inventory->product->name }} (Available: {{ $inventory->quantity }})
+                                    @if(auth()->user()->branch_id === null)
+                                        - Branch: {{ $inventory->branch->name }}
+                                    @endif
                                 </option>
                             @endforeach
                         </select>

@@ -305,6 +305,6 @@ class User extends Authenticatable
 
     public function canAccessStockTransfers()
     {
-        return $this->hasRole(['Admin', 'Super Admin','Stock Manager']);
+        return $this->hasRole(['Admin', 'Super Admin','Stock Manager','Branch Manager']);
     }
 }

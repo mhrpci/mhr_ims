@@ -20,7 +20,7 @@
 
     <div class="row g-4">
         <div class="col-md-3 col-sm-6">
-            <div class="card bg-primary text-white h-100 shadow-sm">
+            <div class="card bg-indigo text-white h-100 shadow-sm" style="background-color: #6610f2;">
                 <div class="card-body d-flex flex-column justify-content-between">
                     <h5 class="card-title fw-light">Total Products</h5>
                     <div class="d-flex align-items-center">
@@ -32,7 +32,7 @@
         </div>
         @if(Auth::user()->hasRole(['Admin', 'Super Admin']))
         <div class="col-md-3 col-sm-6">
-            <div class="card bg-info text-white h-100 shadow-sm">
+            <div class="card h-100 shadow-sm" style="background-color: #20c997;">
                 <div class="card-body d-flex flex-column justify-content-between">
                     <h5 class="card-title fw-light">Total Branches</h5>
                     <div class="d-flex align-items-center">
@@ -44,7 +44,7 @@
         </div>
         @endif
         <div class="col-md-3 col-sm-6">
-            <div class="card bg-success text-white h-100 shadow-sm">
+            <div class="card h-100 shadow-sm" style="background-color: #0dcaf0;">
                 <div class="card-body d-flex flex-column justify-content-between">
                     <h5 class="card-title fw-light">Available Products</h5>
                     <div class="d-flex align-items-center">
@@ -55,8 +55,8 @@
             </div>
         </div>
         <div class="col-md-3 col-sm-6">
-            <div class="card bg-warning text-dark h-100 shadow-sm">
-                <div class="card-body d-flex flex-column justify-content-between">
+            <div class="card h-100 shadow-sm" style="background-color: #fd7e14;">
+                <div class="card-body d-flex flex-column justify-content-between text-white">
                     <h5 class="card-title fw-light">Stock In (This Month)</h5>
                     <div class="d-flex align-items-center">
                         <i class="bi bi-box-arrow-in-down fs-1 me-3"></i>
@@ -66,8 +66,8 @@
             </div>
         </div>
         <div class="col-md-3 col-sm-6">
-            <div class="card bg-danger text-white h-100 shadow-sm">
-                <div class="card-body d-flex flex-column justify-content-between">
+            <div class="card h-100 shadow-sm" style="background-color: #dc3545;">
+                <div class="card-body d-flex flex-column justify-content-between text-white">
                     <h5 class="card-title fw-light">Stock Out (This Month)</h5>
                     <div class="d-flex align-items-center">
                         <i class="bi bi-box-arrow-right fs-1 me-3"></i>
@@ -76,10 +76,21 @@
                 </div>
             </div>
         </div>
+        <div class="col-md-3 col-sm-6">
+            <div class="card h-100 shadow-sm" style="background-color: #198754;">
+                <div class="card-body d-flex flex-column justify-content-between text-white">
+                    <h5 class="card-title fw-light">Stock Transfer (This Month)</h5>
+                    <div class="d-flex align-items-center">
+                        <i class="bi bi-arrow-left-right fs-1 me-3"></i>
+                        <h2 class="card-text mb-0 fw-bold">{{ $stockTransferThisMonth }}</h2>
+                    </div>
+                </div>
+            </div>
+        </div>
         @if(Auth::user()->hasRole(['Admin', 'Super Admin']))
         <div class="col-md-3 col-sm-6">
-            <div class="card bg-secondary text-white h-100 shadow-sm">
-                <div class="card-body d-flex flex-column justify-content-between">
+            <div class="card h-100 shadow-sm" style="background-color: #6f42c1;">
+                <div class="card-body d-flex flex-column justify-content-between text-white">
                     <h5 class="card-title fw-light">Total Users</h5>
                     <div class="d-flex align-items-center">
                         <i class="bi bi-people fs-1 me-3"></i>
@@ -90,8 +101,8 @@
         </div>
 
         <div class="col-md-3 col-sm-6">
-            <div class="card bg-info text-white h-100 shadow-sm">
-                <div class="card-body d-flex flex-column justify-content-between">
+            <div class="card h-100 shadow-sm" style="background-color: #0d6efd;">
+                <div class="card-body d-flex flex-column justify-content-between text-white">
                     <h5 class="card-title fw-light">Total Categories</h5>
                     <div class="d-flex align-items-center">
                         <i class="bi bi-grid fs-1 me-3"></i>
@@ -102,8 +113,8 @@
         </div>
 
         <div class="col-md-3 col-sm-6">
-            <div class="card bg-primary text-white h-100 shadow-sm">
-                <div class="card-body d-flex flex-column justify-content-between">
+            <div class="card h-100 shadow-sm" style="background-color: #1f4b99;">
+                <div class="card-body d-flex flex-column justify-content-between text-white">
                     <h5 class="card-title fw-light">Total Vendors</h5>
                     <div class="d-flex align-items-center">
                         <i class="bi bi-shop fs-1 me-3"></i>
@@ -114,8 +125,8 @@
         </div>
 
         <div class="col-md-3 col-sm-6">
-            <div class="card bg-success text-white h-100 shadow-sm">
-                <div class="card-body d-flex flex-column justify-content-between">
+            <div class="card h-100 shadow-sm" style="background-color: #157347;">
+                <div class="card-body d-flex flex-column justify-content-between text-white">
                     <h5 class="card-title fw-light">Total Customers</h5>
                     <div class="d-flex align-items-center">
                         <i class="bi bi-person-check fs-1 me-3"></i>
@@ -126,8 +137,8 @@
         </div>
 
         <div class="col-md-3 col-sm-6">
-            <div class="card bg-dark text-white h-100 shadow-sm">
-                <div class="card-body d-flex flex-column justify-content-between">
+            <div class="card h-100 shadow-sm" style="background-color: #495057;">
+                <div class="card-body d-flex flex-column justify-content-between text-white">
                     <h5 class="card-title fw-light">Total Tools</h5>
                     <div class="d-flex align-items-center">
                         <i class="bi bi-tools fs-1 me-3"></i>
@@ -138,8 +149,8 @@
         </div>
         @endif
         <div class="col-md-3 col-sm-6">
-            <div class="card bg-warning text-dark h-100 shadow-sm">
-                <div class="card-body d-flex flex-column justify-content-between">
+            <div class="card h-100 shadow-sm" style="background-color: #e9ecef;">
+                <div class="card-body d-flex flex-column justify-content-between text-dark">
                     <h5 class="card-title fw-light">Near Expiry Products</h5>
                     <div class="d-flex align-items-center">
                         <i class="bi bi-exclamation-triangle fs-1 me-3"></i>
@@ -272,6 +283,7 @@
             <div class="card shadow-sm">
                 <div class="card-header bg-light d-flex justify-content-between align-items-center">
                     <h5 class="card-title mb-0">Products Near Expiration</h5>
+                    <a href="{{ route('near.expiry.products') }}" class="btn btn-primary btn-sm">View All</a>
                 </div>
                 <div class="card-body">
                     <div class="table-responsive">
@@ -312,8 +324,9 @@
     <div class="row mt-4 g-4">
         <div class="col-12">
             <div class="card shadow-sm">
-                <div class="card-header bg-light">
+                <div class="card-header bg-light d-flex justify-content-between align-items-center">
                     <h5 class="card-title mb-0">Product Movement Analysis (Last 3 Months)</h5>
+                    <a href="{{ route('product.movement.analysis') }}" class="btn btn-primary btn-sm">View All</a>
                 </div>
                 <div class="card-body">
                     <ul class="nav nav-tabs" id="movementTabs" role="tablist">
@@ -398,6 +411,14 @@
                 data: @json($inventoryTrends['stockOut']),
                 borderColor: 'rgb(255, 99, 132)',
                 backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                tension: 0.1,
+                fill: true
+            },
+            {
+                label: 'Stock Transfer',
+                data: @json($inventoryTrends['stockTransfer']),
+                borderColor: 'rgb(54, 162, 235)',
+                backgroundColor: 'rgba(54, 162, 235, 0.2)',
                 tension: 0.1,
                 fill: true
             }]

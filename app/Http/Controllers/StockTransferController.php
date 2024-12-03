@@ -115,20 +115,38 @@ class StockTransferController extends Controller
             return back()->withErrors(['quantity' => 'Transfer quantity cannot exceed available inventory.']);
         }
 
-        $validatedData['created_by'] = $user->id;
-        $validatedData['updated_by'] = $user->id;
+        DB::transaction(function () use ($validatedData, $user, $inventory) {
+            // Initialize additional fields
+            $transferData = $validatedData;
 
-        // Set status based on role
-        if ($user->hasRole(['Admin', 'Super Admin', 'Branch Manager'])) {
-            $validatedData['status'] = 'approved';
-            $validatedData['approved_by'] = $user->id;
-            $validatedData['approved_at'] = now();
-        } else {
-            $validatedData['status'] = 'pending';
-        }
+            // Set status and approval fields based on role
+            if ($user->hasRole(['Admin', 'Super Admin', 'Branch Manager'])) {
+                $transferData['status'] = 'approved';
+                $transferData['approved_by'] = $user->id;
+                $transferData['approved_at'] = now();
 
-        DB::transaction(function () use ($validatedData, $user) {
-            $stockTransfer = StockTransfer::create($validatedData);
+                // Automatically process the transfer for approved status
+                // Decrease quantity from source branch
+                $inventory->decrement('quantity', $validatedData['quantity']);
+
+                // Increase quantity in destination branch
+                $destinationInventory = Inventory::firstOrCreate(
+                    [
+                        'product_id' => $inventory->product_id,
+                        'branch_id' => $validatedData['to_branch_id']
+                    ],
+                    ['quantity' => 0]
+                );
+
+                $destinationInventory->increment('quantity', $validatedData['quantity']);
+            } else {
+                $transferData['status'] = 'pending';
+            }
+
+            $transferData['created_by'] = $user->id;
+            $transferData['updated_by'] = $user->id;
+
+            $stockTransfer = StockTransfer::create($transferData);
 
             // Broadcast the event
             broadcast(new StockTransferEvent($stockTransfer, 'created'))->toOthers();
@@ -150,6 +168,26 @@ class StockTransferController extends Controller
 
                 foreach ($admins as $admin) {
                     $admin->notify(new StockTransferRequestNotification($stockTransfer));
+                }
+            }
+
+            // Add notification for auto-approved transfers
+            if ($transferData['status'] === 'approved') {
+                // Notify relevant users about the completed transfer
+                $fromBranchManager = User::whereHas('roles', function ($query) {
+                    $query->where('name', 'Branch Manager');
+                })->where('branch_id', $validatedData['from_branch_id'])->first();
+
+                $toBranchManager = User::whereHas('roles', function ($query) {
+                    $query->where('name', 'Branch Manager');
+                })->where('branch_id', $validatedData['to_branch_id'])->first();
+
+                // Notify branch managers if they weren't the one who created the transfer
+                if ($fromBranchManager && $fromBranchManager->id !== $user->id) {
+                    $fromBranchManager->notify(new StockTransferApprovedNotification($stockTransfer));
+                }
+                if ($toBranchManager && $toBranchManager->id !== $user->id) {
+                    $toBranchManager->notify(new StockTransferApprovedNotification($stockTransfer));
                 }
             }
         });

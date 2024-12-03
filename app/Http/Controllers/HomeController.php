@@ -44,6 +44,7 @@ class HomeController extends Controller
                     'availableProducts' => $this->getAvailableProducts($user),
                     'stockInThisMonth' => $this->getStockInThisMonth($user),
                     'stockOutThisMonth' => $this->getStockOutThisMonth($user),
+                    'stockTransferThisMonth' => $this->getStockTransferThisMonth($user),
                     'inventoryTrends' => $this->getInventoryTrends($user),
                     'userDistribution' => $this->getUserDistribution($user),
                     'recentInventoryMovements' => $this->getRecentInventoryMovements($user),
@@ -137,6 +138,28 @@ class HomeController extends Controller
         }
     }
 
+    private function getStockTransferThisMonth($user)
+    {
+        if (!$user) return 0;
+
+        try {
+            $currentMonth = Carbon::now()->startOfMonth();
+            $query = StockTransfer::where('date', '>=', $currentMonth)
+                ->where('status', 'approved');
+
+            if ($user->isBranchRestricted()) {
+                $query->where(function ($query) use ($user) {
+                    $query->where('from_branch_id', $user->branch_id)
+                        ->orWhere('to_branch_id', $user->branch_id);
+                });
+            }
+
+            return $query->sum('quantity') ?? 0;
+        } catch (\Exception $e) {
+            return 0;
+        }
+    }
+
     private function getInventoryTrends($user)
     {
         if (!$user) {
@@ -144,6 +167,7 @@ class HomeController extends Controller
                 'labels' => [],
                 'stockIn' => [],
                 'stockOut' => [],
+                'stockTransfer' => [],
             ];
         }
 
@@ -177,27 +201,48 @@ class HomeController extends Controller
                 ->pluck('total', 'month')
                 ->toArray();
 
+            // Stock Transfer Query
+            $stockTransferQuery = StockTransfer::selectRaw('DATE_FORMAT(date, "%Y-%m") as month, COALESCE(SUM(quantity), 0) as total')
+                ->where('status', 'approved')
+                ->whereBetween('date', [$startDate, $endDate]);
+
+            if ($user->isBranchRestricted()) {
+                $stockTransferQuery->where(function ($query) use ($user) {
+                    $query->where('from_branch_id', $user->branch_id)
+                        ->orWhere('to_branch_id', $user->branch_id);
+                });
+            }
+
+            $stockTransferData = $stockTransferQuery->groupBy('month')
+                ->orderBy('month')
+                ->pluck('total', 'month')
+                ->toArray();
+
             $labels = [];
             $stockIn = [];
             $stockOut = [];
+            $stockTransfer = [];
 
             for ($date = $startDate->copy(); $date <= $endDate; $date->addMonth()) {
                 $monthKey = $date->format('Y-m');
                 $labels[] = $date->format('M Y');
                 $stockIn[] = $stockInData[$monthKey] ?? 0;
                 $stockOut[] = $stockOutData[$monthKey] ?? 0;
+                $stockTransfer[] = $stockTransferData[$monthKey] ?? 0;
             }
 
             return [
                 'labels' => $labels,
                 'stockIn' => $stockIn,
                 'stockOut' => $stockOut,
+                'stockTransfer' => $stockTransfer,
             ];
         } catch (\Exception $e) {
             return [
                 'labels' => [],
                 'stockIn' => [],
                 'stockOut' => [],
+                'stockTransfer' => [],
             ];
         }
     }
@@ -698,5 +743,27 @@ class HomeController extends Controller
                 'slow' => collect([])
             ];
         }
+    }
+
+    public function allNearExpiryProducts()
+    {
+        $user = Auth::user();
+        if (!$user) {
+            return redirect()->route('login');
+        }
+
+        $nearExpiryProducts = $this->getNearExpiryProducts($user);
+        return view('near-expiry-products', compact('nearExpiryProducts'));
+    }
+
+    public function allProductMovementAnalysis()
+    {
+        $user = Auth::user();
+        if (!$user) {
+            return redirect()->route('login');
+        }
+
+        $productMovement = $this->getProductMovementAnalysis($user);
+        return view('product-movement-analysis', compact('productMovement'));
     }
 }
