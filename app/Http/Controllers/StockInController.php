@@ -70,6 +70,7 @@ class StockInController extends Controller
             'unit_price' => 'nullable|numeric|min:0',
             'total_price' => 'nullable|numeric|min:0',
             'date' => 'required|date',
+            'attachments.*' => 'nullable|file|mimes:pdf,doc,docx,xls,xlsx,jpg,jpeg,png|max:10240',
         ]);
 
         // Calculate total price if unit price is provided
@@ -80,8 +81,28 @@ class StockInController extends Controller
         $validatedData['created_by'] = $user->id;
         $validatedData['updated_by'] = $user->id;
 
-        DB::transaction(function () use ($validatedData) {
-            StockIn::create($validatedData);
+        DB::transaction(function () use ($validatedData, $request, $user) {
+            $stockIn = StockIn::create($validatedData);
+
+            // Handle file uploads if any
+            if ($request->hasFile('attachments')) {
+                foreach ($request->file('attachments') as $file) {
+                    $originalName = $file->getClientOriginalName();
+                    $fileName = time() . '_' . $originalName;
+                    $filePath = $file->storeAs('stock-in-attachments', $fileName, 'public');
+                    
+                    $stockIn->attachments()->create([
+                        'file_name' => $fileName,
+                        'original_name' => $originalName,
+                        'file_path' => $filePath,
+                        'file_type' => $file->getClientMimeType(),
+                        'file_size' => $file->getSize(),
+                        'uploaded_by' => $user->id
+                    ]);
+                }
+                
+                $stockIn->update(['has_attachments' => true]);
+            }
 
             $inventory = Inventory::firstOrCreate(
                 [

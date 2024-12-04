@@ -115,13 +115,16 @@ class StockTransferController extends Controller
             return back()->withErrors(['quantity' => 'Transfer quantity cannot exceed available inventory.']);
         }
 
-        DB::transaction(function () use ($validatedData, $user, $inventory) {
+        $status = '';
+
+        DB::transaction(function () use ($validatedData, $user, $inventory, &$status) {
             // Initialize additional fields
             $transferData = $validatedData;
 
             // Set status and approval fields based on role
             if ($user->hasRole(['Admin', 'Super Admin', 'Branch Manager'])) {
                 $transferData['status'] = 'approved';
+                $status = 'approved';
                 $transferData['approved_by'] = $user->id;
                 $transferData['approved_at'] = now();
 
@@ -141,6 +144,7 @@ class StockTransferController extends Controller
                 $destinationInventory->increment('quantity', $validatedData['quantity']);
             } else {
                 $transferData['status'] = 'pending';
+                $status = 'pending';
             }
 
             $transferData['created_by'] = $user->id;
@@ -192,7 +196,7 @@ class StockTransferController extends Controller
             }
         });
 
-        $successMessage = $validatedData['status'] === 'approved'
+        $successMessage = $status === 'approved'
             ? 'Stock transfer has been created and processed successfully.'
             : 'Stock transfer request has been submitted and is pending approval.';
 

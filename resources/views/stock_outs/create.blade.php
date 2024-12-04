@@ -22,7 +22,7 @@
 
     <div class="card shadow mb-4">
         <div class="card-body">
-            <form action="{{ route('stock_outs.store') }}" method="POST">
+            <form action="{{ route('stock_outs.store') }}" method="POST" enctype="multipart/form-data">
                 @csrf
                 <div class="row">
                     <div class="col-md-6 mb-3">
@@ -114,6 +114,18 @@
                         <label for="date" class="form-label">Date <span class="text-danger">*</span></label>
                         <input type="date" name="date" id="date" class="form-control @error('date') is-invalid @enderror" value="{{ old('date') }}" required>
                         @error('date')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12 mb-3">
+                        <label for="attachments" class="form-label">Attachments</label>
+                        <input type="file" name="attachments[]" id="attachments" class="form-control @error('attachments.*') is-invalid @enderror" multiple>
+                        <small class="text-muted">
+                            Accepted files: PDF, DOC, DOCX, XLS, XLSX, JPG, JPEG, PNG (Max: 10MB each)
+                        </small>
+                        @error('attachments.*')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
                     </div>

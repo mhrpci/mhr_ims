@@ -6,11 +6,11 @@
 <div class="container-fluid">
     <div class="row mb-4">
         <div class="col">
-            <h1 class="h3 mb-0 text-gray-800">Create New Vendor</h1>
+            <h1 class="h3 mb-0 text-gray-800">Create New Supplier</h1>
         </div>
         <div class="col-auto">
             <a href="{{ route('vendors.index') }}" class="btn btn-outline-secondary">
-                <i class="bi bi-arrow-left me-2"></i>Back to Vendors
+                <i class="bi bi-arrow-left me-2"></i>Back to Suppliers
             </a>
         </div>
     </div>
@@ -58,7 +58,7 @@
                 </div>
                 <div class="mt-4 text-end">
                     <button type="submit" name="action" value="save" class="btn btn-primary">
-                        <i class="bi bi-plus-circle me-2"></i>Create Vendor
+                        <i class="bi bi-plus-circle me-2"></i>Create Supplier
                     </button>
                     <button type="submit" name="action" value="save_and_new" class="btn btn-secondary">
                         <i class="bi bi-plus-square me-2"></i>Save and Create New

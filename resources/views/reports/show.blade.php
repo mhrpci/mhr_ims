@@ -90,7 +90,7 @@
                                     <td>{{ $item->date instanceof \DateTime ? $item->date->format('F j, Y') : $item->date }}</td>
                                 @elseif($report->type == 'stock_out')
                                     <td>{{ $item->product->name }}</td>
-                                    <td>{{ $item->customer->name }}</td>
+                                    <td>{{ $item->customer->name ?? 'N/A' }}</td>
                                     <td>{{ $item->branch->name }}</td>
                                     <td>{{ $item->quantity }}</td>
                                     <td>{{ number_format($item->unit_price, 2) }}</td>

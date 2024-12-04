@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Picqer\Barcode\BarcodeGeneratorPNG;
 
 class Product extends Model
@@ -17,7 +18,7 @@ class Product extends Model
         return $this->belongsTo(Category::class);
     }
 
-    public function inventories()
+    public function inventories(): HasMany
     {
         return $this->hasMany(Inventory::class);
     }
@@ -51,5 +52,26 @@ class Product extends Model
     public function updater()
     {
         return $this->belongsTo(User::class, 'updated_by')->select(['id', 'username']);
+    }
+
+    public function forPhsses(): HasMany
+    {
+        return $this->hasMany(ForPhss::class);
+    }
+
+    public function deductInventory($qty, $branchId)
+    {
+        $inventory = $this->inventories()
+            ->where('branch_id', $branchId)
+            ->firstOrFail();
+
+        if ($inventory->qty < $qty) {
+            throw new \Exception('Insufficient inventory quantity');
+        }
+
+        $inventory->qty -= $qty;
+        $inventory->save();
+
+        return $inventory;
     }
 }

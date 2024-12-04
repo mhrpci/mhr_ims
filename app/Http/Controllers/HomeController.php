@@ -280,7 +280,9 @@ class HomeController extends Controller
 
     private function getRecentInventoryMovements($user)
     {
-        if (!$user) return collect([]);
+        if (!$user || !$user->hasRole(['Branch Manager', 'Admin', 'Super Admin'])) {
+            return collect([]);
+        }
 
         try {
             // Stock In Query
@@ -598,7 +600,9 @@ class HomeController extends Controller
 
     private function getNearExpiryProducts($user)
     {
-        if (!$user) return collect([]);
+        if (!$user || !$user->hasRole(['Branch Manager', 'Admin', 'Super Admin'])) {
+            return collect([]);
+        }
 
         try {
             $warningDays = 90; // Configure how many days in advance to show warning
@@ -640,7 +644,9 @@ class HomeController extends Controller
 
     private function getNearExpiryCount($user)
     {
-        if (!$user) return 0;
+        if (!$user || !$user->hasRole(['Branch Manager', 'Admin', 'Super Admin'])) {
+            return 0;
+        }
 
         try {
             $warningDays = 90;
@@ -664,11 +670,13 @@ class HomeController extends Controller
 
     private function getProductMovementAnalysis($user)
     {
-        if (!$user) return [
-            'fast' => collect([]),
-            'moderate' => collect([]),
-            'slow' => collect([])
-        ];
+        if (!$user || !$user->hasRole(['Branch Manager', 'Admin', 'Super Admin'])) {
+            return [
+                'fast' => collect([]),
+                'moderate' => collect([]),
+                'slow' => collect([])
+            ];
+        }
 
         try {
             $endDate = Carbon::now();

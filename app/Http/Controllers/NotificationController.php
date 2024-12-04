@@ -9,6 +9,7 @@ use App\Notifications\StockTransferApprovedNotification;
 use App\Notifications\StockTransferRejectedNotification;
 use App\Notifications\StockTransferRequestNotification;
 use App\Notifications\NearExpiryNotification;
+use App\Models\StockIn;
 
 class NotificationController extends Controller
 {
@@ -85,6 +86,48 @@ class NotificationController extends Controller
         foreach ($administrators as $admin) {
             $admin->notify(new StockTransferRequestNotification($stockTransfer));
         }
+    }
+
+    public function checkAndNotifyNearExpiryStockIns()
+    {
+        $fifteenDaysFromNow = now()->addDays(15)->endOfDay();
+        $user = Auth::user();
+
+        // Get near expiry stock ins
+        $query = StockIn::with(['product', 'branch'])
+            ->whereNotNull('expiration_date')
+            ->where('expiration_date', '<=', $fifteenDaysFromNow)
+            ->where('expiration_date', '>', now());  // Only get future expiring items
+
+        // Filter by branch if user is branch restricted
+        if ($user->isBranchRestricted()) {
+            $query->where('branch_id', $user->branch_id);
+        }
+
+        $nearExpiryStockIns = $query->get();
+
+        // Get users to notify based on their roles and branches
+        foreach ($nearExpiryStockIns as $stockIn) {
+            // Get branch managers of the specific branch
+            $branchManagers = User::role('Branch Manager')
+                ->where('branch_id', $stockIn->branch_id)
+                ->get();
+
+            // Get all Admin and Super Admin users
+            $administrators = User::role(['Admin', 'Super Admin'])->get();
+
+            // Notify branch managers
+            foreach ($branchManagers as $manager) {
+                $manager->notify(new NearExpiryNotification($stockIn));
+            }
+
+            // Notify administrators
+            foreach ($administrators as $admin) {
+                $admin->notify(new NearExpiryNotification($stockIn));
+            }
+        }
+
+        return back()->with('success', 'Near expiry notifications sent successfully.');
     }
 
 }

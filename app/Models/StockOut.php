@@ -23,7 +23,8 @@ class StockOut extends Model
         'date',
         'transfer_request_id',
         'created_by',
-        'updated_by'
+        'updated_by',
+        'has_attachments'
     ];
 
     protected $casts = [
@@ -70,5 +71,10 @@ class StockOut extends Model
     public function stockIn()
     {
         return $this->belongsTo(StockIn::class);
+    }
+
+    public function attachments()
+    {
+        return $this->hasMany(StockOutAttachment::class);
     }
 }

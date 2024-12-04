@@ -20,4 +20,9 @@ class Inventory extends Model
     {
         return $this->belongsTo(Branch::class);
     }
+
+    public function forPhsses()
+    {
+        return $this->hasMany(ForPhss::class);
+    }
 }

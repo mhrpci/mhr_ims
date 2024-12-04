@@ -72,8 +72,8 @@ class StockOutController extends Controller
             'date' => 'required|date',
         ]);
 
-        $validatedData['created_by'] = $user->id;
-        $validatedData['updated_by'] = $user->id;
+        $validatedData['created_by'] = auth()->id();
+        $validatedData['updated_by'] = auth()->id();
         
         // Generate stock out number only if not provided
         if (empty($validatedData['stock_out_number'])) {
@@ -85,18 +85,45 @@ class StockOutController extends Controller
             $validatedData['total_price'] = $validatedData['unit_price'] * $validatedData['quantity'];
         }
 
+        // Check inventory existence and quantity before starting transaction
         $inventory = Inventory::where('product_id', $validatedData['product_id'])
             ->where('branch_id', $validatedData['branch_id'])
             ->first();
 
-        if (!$inventory || $inventory->quantity < $validatedData['quantity']) {
+        if (!$inventory) {
             return redirect()->back()->withInput()
-                ->with('error', 'Insufficient stock for this product in the selected branch.');
+                ->with('error', 'No inventory record found for this product in the selected branch.');
         }
 
-        DB::transaction(function () use ($validatedData, $inventory) {
-            StockOut::create($validatedData);
+        if ($inventory->quantity < $validatedData['quantity']) {
+            return redirect()->back()->withInput()
+                ->with('error', 'Insufficient stock. Available quantity: ' . $inventory->quantity);
+        }
 
+        DB::transaction(function () use ($validatedData, $request, $inventory) {
+            $stockOut = StockOut::create($validatedData);
+
+            // Handle file uploads if any
+            if ($request->hasFile('attachments')) {
+                foreach ($request->file('attachments') as $file) {
+                    $originalName = $file->getClientOriginalName();
+                    $fileName = time() . '_' . $originalName;
+                    $filePath = $file->storeAs('stock-out-attachments', $fileName, 'public');
+                    
+                    $stockOut->attachments()->create([
+                        'file_name' => $fileName,
+                        'original_name' => $originalName,
+                        'file_path' => $filePath,
+                        'file_type' => $file->getClientMimeType(),
+                        'file_size' => $file->getSize(),
+                        'uploaded_by' => auth()->id()
+                    ]);
+                }
+                
+                $stockOut->update(['has_attachments' => true]);
+            }
+
+            // Update inventory
             $inventory->quantity -= $validatedData['quantity'];
             $inventory->save();
         });

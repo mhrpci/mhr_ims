@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Vendors')
+@section('title', 'Suppliers')
 
 @section('content')
 <div class="container-fluid">
@@ -13,11 +13,11 @@
 
     <div class="row mb-4">
         <div class="col">
-            <h1 class="h3 mb-0 text-gray-800">Vendors Management</h1>
+            <h1 class="h3 mb-0 text-gray-800">Suppliers Management</h1>
         </div>
         <div class="col-auto">
             <a href="{{ route('vendors.create') }}" class="btn btn-primary">
-                <i class="bi bi-plus-circle me-2"></i>Create New Vendor
+                <i class="bi bi-plus-circle me-2"></i>Create New Supplier
             </a>
         </div>
     </div>

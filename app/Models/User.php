@@ -307,4 +307,19 @@ class User extends Authenticatable
     {
         return $this->hasRole(['Admin', 'Super Admin','Stock Manager','Branch Manager']);
     }
+
+    public function canManageForPhss()
+    {
+        return $this->hasRole(['Admin', 'Super Admin', 'Branch Manager']);
+    }
+
+    public function canDeleteForPhss()
+    {
+        return $this->hasRole(['Admin', 'Super Admin']);
+    }
+
+    public function canUpdateForPhss()
+    {
+        return $this->hasRole(['Admin', 'Super Admin', 'Branch Manager']);
+    }
 }

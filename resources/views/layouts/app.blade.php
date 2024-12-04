@@ -23,6 +23,7 @@
     <link href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" rel="stylesheet" />
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css">
 </head>
 <body>
     <!-- Add the preloader HTML structure -->
@@ -100,6 +101,14 @@
                         <span class="d-none d-lg-inline">{{ __('Receiving Reports') }}</span>
                     </a>
                 </li>
+                @if(Auth::user()->canManageForPhss())
+                <li class="nav-item">
+                    <a class="nav-link {{ Request::is('for-phss*') ? 'active' : '' }}" href="{{ route('for-phss.index')}}">
+                        <i class="bi bi-box-arrow-right me-2"></i>
+                        <span class="d-none d-lg-inline">{{ __('Borrow Product') }}</span>
+                    </a>
+                </li>
+                @endif
                 @if(Auth::user()->canAccess())
                 <li class="nav-item">
                     <a class="nav-link {{ Request::is('customers*') ? 'active' : '' }}" href="{{ route('customers.index') }}">
@@ -110,7 +119,7 @@
                 <li class="nav-item">
                     <a class="nav-link {{ Request::is('vendors*') ? 'active' : '' }}" href="{{ route('vendors.index') }}">
                         <i class="bi bi-people me-2"></i>
-                        <span class="d-none d-lg-inline">{{ __('Vendors') }}</span>
+                        <span class="d-none d-lg-inline">{{ __('Suppliers') }}</span>
                     </a>
                 </li>
                 @endif
@@ -168,6 +177,10 @@
                         <i class="bi bi-building me-1"></i>
                         {{ Auth::user()->branch->name }}
                     </div>
+                @else
+                    <h4 class="ms-3 text-muted d-none d-lg-block">
+                        {{ __('Inventory Management System') }}
+                    </h4>
                 @endif
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent">
                     <span class="navbar-toggler-icon"></span>

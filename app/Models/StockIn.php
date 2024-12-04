@@ -23,7 +23,8 @@ class StockIn extends Model
         'date', 
         'transfer_request_id', 
         'created_by', 
-        'updated_by'
+        'updated_by',
+        'has_attachments'
     ];
 
     protected $casts = [
@@ -63,5 +64,10 @@ class StockIn extends Model
     public function updater()
     {
         return $this->belongsTo(User::class, 'updated_by')->select(['id', 'username']);
+    }
+
+    public function attachments()
+    {
+        return $this->hasMany(StockInAttachment::class);
     }
 }

@@ -68,7 +68,7 @@ class GenerateReportJob implements ShouldQueue
             case 'stock_out':
                 return [
                     $item->product->name,
-                    $item->{$this->report->type === 'stock_in' ? 'vendor' : 'customer'}->name,
+                    $item->{$this->report->type === 'stock_in' ? 'vendor' : 'customer'}->name ?? 'N/A',
                     $item->branch->name,
                     $item->quantity,
                     $item->unit_price,

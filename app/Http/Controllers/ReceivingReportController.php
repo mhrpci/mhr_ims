@@ -81,53 +81,72 @@ class ReceivingReportController extends Controller
             'items.*.vendor_id' => 'nullable|exists:vendors,id',
         ]);
 
-        foreach ($request->items as $item) {
-            // Check if product exists
-            $product = Product::where('barcode', $item['barcode'])
-                ->where('branch_id', $request->branch_id)
-                ->first();
+        // Start a database transaction
+        \DB::beginTransaction();
 
-            // If product doesn't exist, create it
-            if (!$product) {
-                $product = Product::create([
-                    'name' => $item['name'],
-                    'barcode' => $item['barcode'],
-                    'category_id' => $item['category_id'],
-                    'branch_id' => $request->branch_id,
-                    'created_by' => auth()->id(),
-                    'updated_by' => auth()->id(),
-                ]);
+        try {
+            foreach ($request->items as $item) {
+                $existingProduct = Product::where('barcode', $item['barcode'])
+                    ->where('branch_id', $request->branch_id)
+                    ->first();
+                    
+                if (!$existingProduct) {
+                    // Create new product only if it doesn't exist
+                    $product = Product::create([
+                        'name' => $item['name'],
+                        'barcode' => $item['barcode'],
+                        'category_id' => $item['category_id'],
+                        'branch_id' => $request->branch_id,
+                        'created_by' => auth()->id(),
+                        'updated_by' => auth()->id(),
+                    ]);
 
-                // Initialize inventory for the new product
-                Inventory::create([
-                    'product_id' => $product->id,
-                    'branch_id' => $request->branch_id,
-                    'quantity' => 0,
-                ]);
+                    // Initialize inventory for the new product
+                    Inventory::create([
+                        'product_id' => $product->id,
+                        'branch_id' => $request->branch_id,
+                        'quantity' => 0,
+                    ]);
+                }
+
+                // Check if receiving report with same barcode exists
+                $existingReport = ReceivingReport::where('receiving_report_number', $request->receiving_report_number)
+                    ->where('barcode', $item['barcode'])
+                    ->first();
+
+                if (!$existingReport) {
+                    // Create receiving report entry
+                    ReceivingReport::create([
+                        'receiving_report_number' => $request->receiving_report_number,
+                        'item_code' => $item['item_code'],
+                        'name' => $item['name'],
+                        'barcode' => $item['barcode'],
+                        'quantity' => $item['quantity'],
+                        'unit' => $item['unit'],
+                        'date_received' => $request->date_received,
+                        'branch_id' => $request->branch_id,
+                        'category_id' => $item['category_id'],
+                        'vendor_id' => $item['vendor_id'] ?? null,
+                    ]);
+                }
             }
 
-            // Create receiving report for each item
-            ReceivingReport::create([
-                'receiving_report_number' => $request->receiving_report_number,
-                'item_code' => $item['item_code'],
-                'name' => $item['name'],
-                'barcode' => $item['barcode'],
-                'quantity' => $item['quantity'],
-                'unit' => $item['unit'],
-                'date_received' => $request->date_received,
-                'branch_id' => $request->branch_id,
-                'category_id' => $item['category_id'],
-                'vendor_id' => $item['vendor_id'] ?? null,
-            ]);
-        }
+            \DB::commit();
 
-        if ($request->input('action') === 'save_and_new') {
-            return redirect()->route('receiving-reports.create')
-                ->with('success', 'Receiving report created successfully. Create another one.');
-        }
+            if ($request->input('action') === 'save_and_new') {
+                return redirect()->route('receiving-reports.create')
+                    ->with('success', 'Receiving report created successfully. Create another one.');
+            }
 
-        return redirect()->route('receiving-reports.index')
-            ->with('success', 'Receiving report created successfully.');
+            return redirect()->route('receiving-reports.index')
+                ->with('success', 'Receiving report created successfully.');
+
+        } catch (\Exception $e) {
+            \DB::rollback();
+            return redirect()->back()
+                ->withInput()
+                ->with('error', 'An error occurred while saving the receiving report. ' . $e->getMessage());
+        }
     }
 
     public function show(ReceivingReport $receivingReport)

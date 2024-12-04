@@ -28,7 +28,6 @@
                 <table class="table table-striped movement-table">
                     <thead>
                         <tr>
-                            <th>Product Code</th>
                             <th>Product Name</th>
                             <th>Total Quantity</th>
                             <th>Transactions</th>
@@ -38,7 +37,6 @@
                     <tbody>
                         @forelse($productMovement[$key] as $item)
                         <tr>
-                            <td>{{ $item['product_code'] }}</td>
                             <td>{{ $item['product_name'] }}</td>
                             <td>{{ number_format($item['total_quantity']) }}</td>
                             <td>{{ $item['transaction_count'] }}</td>

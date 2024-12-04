@@ -21,6 +21,7 @@ use App\Http\Controllers\BarcodeController;
 use App\Http\Controllers\StockTransferController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\ReceivingReportController;
+use App\Http\Controllers\ForPhssController;
 
 /*
 |--------------------------------------------------------------------------
@@ -147,6 +148,9 @@ Route::middleware(['auth'])->group(function () {
 
     Route::get('/near-expiry-products', [HomeController::class, 'allNearExpiryProducts'])->name('near.expiry.products');
     Route::get('/product-movement-analysis', [HomeController::class, 'allProductMovementAnalysis'])->name('product.movement.analysis');
+
+    // PHSS Routes
+    Route::resource('for-phss', ForPhssController::class);
 
 });
 
