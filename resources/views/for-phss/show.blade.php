@@ -100,7 +100,7 @@
          */
         const fetchPHSSData = async () => {
             try {
-                const response = await fetch('http://192.168.1.30:8881/api/phss');
+                const response = await fetch('https://chuweyweb.site/api/phss');
                 if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
                 const { data: phssData } = await response.json();
                 
@@ -126,7 +126,7 @@
          */
         const fetchHospitalData = async () => {
             try {
-                const response = await fetch('http://192.168.1.30:8881/api/hospitals');
+                const response = await fetch('https://chuweyweb.site/api/hospitals');
                 if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
                 const { data: hospitalData } = await response.json();
                 
