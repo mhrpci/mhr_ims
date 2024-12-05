@@ -7,6 +7,7 @@ use App\Models\Product;
 use App\Models\Vendor;
 use App\Models\Branch;
 use App\Models\Inventory;
+use App\Models\ReceivingReport;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
@@ -33,17 +34,22 @@ class StockInController extends Controller
         $user = Auth::user();
         $vendors = Vendor::all();
 
+        $receivingReportsQuery = ReceivingReport::whereDoesntHave('stockIn');
+        
         if ($user->isBranchRestricted()) {
             $branches = Branch::where('id', $user->branch_id)->get();
             $products = Product::whereHas('inventories', function ($query) use ($user) {
                 $query->where('branch_id', $user->branch_id);
             })->get();
+            $receivingReportsQuery->where('branch_id', $user->branch_id);
         } else {
             $branches = Branch::all();
             $products = Product::all();
         }
 
-        return view('stock_ins.create', compact('products', 'vendors', 'branches'));
+        $receivingReports = $receivingReportsQuery->get();
+
+        return view('stock_ins.create', compact('products', 'vendors', 'branches', 'receivingReports'));
     }
 
     public function store(Request $request)
@@ -62,6 +68,7 @@ class StockInController extends Controller
                     }
                 },
             ],
+            'receiving_report_id' => 'required|exists:receiving_reports,id',
             'quantity' => 'required|integer|min:1',
             'unit' => 'required|string',
             'lot_number' => 'required|string|unique:stock_ins,lot_number',
@@ -73,7 +80,39 @@ class StockInController extends Controller
             'attachments.*' => 'nullable|file|mimes:pdf,doc,docx,xls,xlsx,jpg,jpeg,png|max:10240',
         ]);
 
-        // Calculate total price if unit price is provided
+        $receivingReport = ReceivingReport::findOrFail($validatedData['receiving_report_id']);
+        
+        if ($receivingReport->stockIn()->exists()) {
+            return redirect()->back()
+                ->withErrors(['receiving_report_id' => 'This receiving report has already been used'])
+                ->withInput();
+        }
+
+        if ($receivingReport->branch_id != $validatedData['branch_id']) {
+            return redirect()->back()
+                ->withErrors(['branch_id' => 'Branch must match the receiving report'])
+                ->withInput();
+        }
+
+        $product = Product::findOrFail($validatedData['product_id']);
+        if ($product->name != $receivingReport->name || $product->barcode != $receivingReport->barcode) {
+            return redirect()->back()
+                ->withErrors(['product_id' => 'Product must match the receiving report details'])
+                ->withInput();
+        }
+
+        if ($validatedData['quantity'] != $receivingReport->quantity) {
+            return redirect()->back()
+                ->withErrors(['quantity' => 'Quantity must match the receiving report'])
+                ->withInput();
+        }
+
+        if ($validatedData['unit'] != $receivingReport->unit) {
+            return redirect()->back()
+                ->withErrors(['unit' => 'Unit must match the receiving report'])
+                ->withInput();
+        }
+
         if ($request->filled('unit_price')) {
             $validatedData['total_price'] = $validatedData['unit_price'] * $validatedData['quantity'];
         }
@@ -84,7 +123,6 @@ class StockInController extends Controller
         DB::transaction(function () use ($validatedData, $request, $user) {
             $stockIn = StockIn::create($validatedData);
 
-            // Handle file uploads if any
             if ($request->hasFile('attachments')) {
                 foreach ($request->file('attachments') as $file) {
                     $originalName = $file->getClientOriginalName();
@@ -136,12 +174,8 @@ class StockInController extends Controller
         return view('stock_ins.show', compact('stockIn'));
     }
 
-    // Edit and Update methods are typically not needed for StockIn as it's usually a one-time transaction
-
     public function destroy(StockIn $stockIn)
     {
-        // Deleting StockIn entries is usually not recommended.
-        // Instead, consider adding a 'void' or 'cancelled' status if needed.
         return redirect()->route('stock_ins.index')->with('error', 'Deleting Stock In entries is not allowed.');
     }
 }

@@ -43,6 +43,7 @@
                             <th>Product</th>
                             <th>Vendor</th>
                             <th>Branch</th>
+                            <th>Receiving Report</th>
                             <th>Quantity</th>
                             <th>Unit</th>
                             <th>Lot Number</th>
@@ -58,7 +59,8 @@
                             <td>{{ $stockIn->product->name }}</td>
                             <td>{{ $stockIn->vendor->name ?? 'N/A' }}</td>
                             <td>{{ $stockIn->branch->name }}</td>
-                            <td>{{ $stockIn->quantity }} {{ $stockIn->unit }}</td>
+                            <td>{{ $stockIn->receivingReport->receiving_report_number ?? 'N/A' }}</td>
+                            <td>{{ $stockIn->quantity }}</td>
                             <td>{{ $stockIn->unit }}</td>
                             <td>{{ $stockIn->lot_number }}</td>
                             <td>{{ $stockIn->expiration_date ? $stockIn->expiration_date->format('Y-m-d') : 'N/A' }}</td>
@@ -107,11 +109,11 @@
         var table = $('.datatable').DataTable({
             columnDefs: [
                 {
-                    targets: 8, // Date column index (adjust this based on your table structure)
+                    targets: 9, // Date column index (adjust this based on your table structure)
                     type: 'date'
                 }
             ],
-            order: [[8, 'desc']], // Sort by date column descending by default
+            order: [[9, 'desc']], // Sort by date column descending by default
         });
 
         // Remove any existing search function before adding new one
@@ -122,7 +124,7 @@
             function(settings, data, dataIndex) {
                 var startDate = $('#startDateFilter').val();
                 var endDate = $('#endDateFilter').val();
-                var date = moment(data[8], 'YYYY-MM-DD').format('YYYY-MM-DD'); // Convert displayed date to YYYY-MM-DD
+                var date = moment(data[9], 'YYYY-MM-DD').format('YYYY-MM-DD'); // Convert displayed date to YYYY-MM-DD
 
                 if (startDate === '' && endDate === '') return true;
                 if (startDate === '' && date <= endDate) return true;

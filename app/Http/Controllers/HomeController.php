@@ -7,6 +7,7 @@ use App\Models\StockIn;
 use App\Models\StockOut;
 use App\Models\User;
 use App\Models\StockTransfer;
+use App\Models\ForPhss;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -29,6 +30,14 @@ class HomeController extends Controller
         }
 
         try {
+            // Debug information
+            \Log::info("Dashboard Load", [
+                'user_id' => $user->id,
+                'branch_id' => $user->branch_id,
+                'roles' => $user->roles->pluck('name'),
+                'is_branch_restricted' => $user->isBranchRestricted()
+            ]);
+
             // Cache key unique to each user
             $cacheKey = "dashboard_data_user_{$user->id}";
             
@@ -52,11 +61,16 @@ class HomeController extends Controller
                     'nearExpiryProducts' => $this->getNearExpiryProducts($user),
                     'nearExpiryCount' => $this->getNearExpiryCount($user),
                     'productMovement' => $this->getProductMovementAnalysis($user),
+                    'phssForDemo' => $this->getPhssCountByStatus($user, 'for_demo'),
+                    'phssForEvaluation' => $this->getPhssCountByStatus($user, 'for_evaluation'),
+                    'phssReturned' => $this->getPhssCountByStatus($user, 'returned'),
+                    'totalPhssItems' => $this->getTotalPhssItems($user),
                 ];
             });
 
             return view('home', $data);
         } catch (\Exception $e) {
+            \Log::error("Dashboard Error: " . $e->getMessage());
             return view('home', [
                 'error' => 'An error occurred while loading the dashboard data.'
             ]);
@@ -773,5 +787,73 @@ class HomeController extends Controller
 
         $productMovement = $this->getProductMovementAnalysis($user);
         return view('product-movement-analysis', compact('productMovement'));
+    }
+
+    private function getPhssCountByStatus($user, $status)
+    {
+        if (!$user) return 0;
+
+        try {
+            $query = ForPhss::where('status', $status);
+
+            if ($user->isBranchRestricted()) {
+                $query->whereHas('product', function ($q) use ($user) {
+                    $q->where('branch_id', $user->branch_id);
+                });
+            }
+
+            // Debug information
+            \Log::info("PHSS Query for status {$status}", [
+                'sql' => $query->toSql(),
+                'bindings' => $query->getBindings(),
+                'count' => $query->count()
+            ]);
+
+            return $query->count();
+        } catch (\Exception $e) {
+            \Log::error("Error getting PHSS count for status {$status}: " . $e->getMessage());
+            return 0;
+        }
+    }
+
+    private function getTotalPhssItems($user)
+    {
+        if (!$user) return 0;
+
+        try {
+            $query = ForPhss::query();
+
+            if ($user->isBranchRestricted()) {
+                $query->whereHas('product', function ($q) use ($user) {
+                    $q->where('branch_id', $user->branch_id);
+                });
+            }
+
+            return $query->count();
+        } catch (\Exception $e) {
+            \Log::error("Error getting total PHSS items: " . $e->getMessage());
+            return 0;
+        }
+    }
+
+    private function verifyBranchAccess($user)
+    {
+        if (!$user) return false;
+
+        try {
+            $isBranchRestricted = $user->isBranchRestricted();
+            $branchId = $user->branch_id;
+
+            \Log::info("User Branch Access Check", [
+                'user_id' => $user->id,
+                'is_branch_restricted' => $isBranchRestricted,
+                'branch_id' => $branchId
+            ]);
+
+            return true;
+        } catch (\Exception $e) {
+            \Log::error("Error checking branch access: " . $e->getMessage());
+            return false;
+        }
     }
 }

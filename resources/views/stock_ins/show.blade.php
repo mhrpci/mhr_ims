@@ -61,6 +61,16 @@
                                     <th scope="row" class="text-muted">Updated by:</th>
                                     <td>{{ $stockIn->updater ? $stockIn->updater->username : 'System' }}</td>
                                 </tr>
+                                <tr>
+                                    <th scope="row" class="text-muted">Receiving Report:</th>
+                                    <td>
+                                        @if($stockIn->receivingReport)
+                                            {{ $stockIn->receivingReport->receiving_report_number }}
+                                        @else
+                                            N/A
+                                        @endif
+                                    </td>
+                                </tr>
                             </tbody>
                         </table>
                     </div>

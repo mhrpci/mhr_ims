@@ -67,6 +67,54 @@
                 </div>
             </div>
 
+            <div class="row">
+                <div class="col-12 mb-4">
+                    <div class="border-left-info p-3 bg-light rounded">
+                        <label class="form-label fw-bold text-primary">Documents</label>
+                        <div class="table-responsive">
+                            <table class="table table-bordered table-hover mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Document Name</th>
+                                        <th>Type</th>
+                                        <th>Uploaded By</th>
+                                        <th>Upload Date</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @forelse($forPhss->documents as $document)
+                                        <tr>
+                                            <td>{{ $document->original_name }}</td>
+                                            <td>
+                                                <span class="badge bg-secondary">
+                                                    {{ strtoupper(pathinfo($document->original_name, PATHINFO_EXTENSION)) }}
+                                                </span>
+                                            </td>
+                                            <td>{{ $document->uploader->name }}</td>
+                                            <td>{{ $document->created_at->format('M d, Y H:i') }}</td>
+                                            <td>
+                                                <a href="{{ Storage::url($document->file_path) }}" 
+                                                   class="btn btn-sm btn-info" 
+                                                   target="_blank">
+                                                    <i class="bi bi-eye"></i> View
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    @empty
+                                        <tr>
+                                            <td colspan="5" class="text-center text-muted">
+                                                No documents available
+                                            </td>
+                                        </tr>
+                                    @endforelse
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <div class="row mt-3">
                 <div class="col-12">
                     <div class="d-flex justify-content-end gap-2">

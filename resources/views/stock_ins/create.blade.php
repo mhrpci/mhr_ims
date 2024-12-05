@@ -26,6 +26,26 @@
                 @csrf
                 <div class="row">
                     <div class="col-md-6 mb-3">
+                        <label for="receiving_report_id" class="form-label">Receiving Report <span class="text-danger">*</span></label>
+                        <select class="form-select @error('receiving_report_id') is-invalid @enderror" name="receiving_report_id" id="receiving_report_id" required>
+                            <option value="">Select Receiving Report</option>
+                            @foreach($receivingReports as $report)
+                                <option value="{{ $report->id }}" 
+                                        data-product-id="{{ $report->product_id }}"
+                                        data-branch-id="{{ $report->branch_id }}"
+                                        data-quantity="{{ $report->quantity }}"
+                                        data-unit="{{ $report->unit }}">
+                                    {{ $report->receiving_report_number }} - {{ $report->name }}
+                                </option>
+                            @endforeach
+                        </select>
+                        @error('receiving_report_id')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
                         <label for="product_id" class="form-label">Product <span class="text-danger">*</span></label>
                         <select class="form-select @error('product_id') is-invalid @enderror" name="product_id" id="product_id" required>
                             <option value="">Select Product</option>
@@ -139,6 +159,7 @@
                         @enderror
                     </div>
                 </div>
+                
                 <div class="mt-4 text-end">
                     <button type="submit" name="action" value="save" class="btn btn-primary">
                         <i class="bi bi-plus-circle me-2"></i>Create Stock In
@@ -152,3 +173,50 @@
     </div>
 </div>
 @endsection
+
+@push('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const receivingReportSelect = document.getElementById('receiving_report_id');
+    const productSelect = document.getElementById('product_id');
+    const branchSelect = document.getElementById('branch_id');
+    const quantityInput = document.getElementById('quantity');
+    const unitInput = document.getElementById('unit');
+
+    receivingReportSelect.addEventListener('change', function() {
+        const selectedOption = this.options[this.selectedIndex];
+        
+        if (selectedOption.value) {
+            // Set product
+            productSelect.value = selectedOption.dataset.productId;
+            productSelect.disabled = true;
+
+            // Set branch
+            branchSelect.value = selectedOption.dataset.branchId;
+            branchSelect.disabled = true;
+
+            // Set quantity
+            quantityInput.value = selectedOption.dataset.quantity;
+            quantityInput.readOnly = true;
+
+            // Set unit
+            unitInput.value = selectedOption.dataset.unit;
+            unitInput.readOnly = true;
+        } else {
+            // Reset and enable fields
+            productSelect.value = '';
+            productSelect.disabled = false;
+            
+            branchSelect.value = '';
+            branchSelect.disabled = false;
+            
+            quantityInput.value = '';
+            quantityInput.readOnly = false;
+            
+            unitInput.value = '';
+            unitInput.readOnly = false;
+        }
+    });
+});
+</script>
+@endpush

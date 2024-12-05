@@ -31,6 +31,7 @@
                             <th>PHSS Name</th>
                             <th>Hospital Name</th>
                             <th>Status</th>
+                            <th>Documents</th>
                             <th>Actions</th>
                         </tr>
                     </thead>
@@ -48,6 +49,12 @@
                                 Loading...
                             </td>
                             <td><span class="badge bg-{{ $phss->status === 'returned' ? 'success' : 'primary' }}">{{ str_replace('_', ' ', ucfirst($phss->status)) }}</span></td>
+                            <td>
+                                <span class="badge bg-secondary">
+                                    {{ $phss->documents->count() }} 
+                                    {{ Str::plural('document', $phss->documents->count()) }}
+                                </span>
+                            </td>
                             <td>
                                 <a href="{{ route('for-phss.show', $phss) }}" class="btn btn-sm btn-info" title="View">
                                     <i class="bi bi-eye"></i> View

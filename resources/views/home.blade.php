@@ -159,6 +159,53 @@
                 </div>
             </div>
         </div>
+        <div class="col-md-3 col-sm-6">
+            <div class="card h-100 shadow-sm" style="background-color: #0ea5e9;">
+                <div class="card-body d-flex flex-column justify-content-between text-white">
+                    <h5 class="card-title fw-light">Product For Demo</h5>
+                    <div class="d-flex align-items-center">
+                        <i class="bi bi-display fs-1 me-3"></i>
+                        <h2 class="card-text mb-0 fw-bold">{{ $phssForDemo ?? 0 }}</h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3 col-sm-6">
+            <div class="card h-100 shadow-sm" style="background-color: #8b5cf6;">
+                <div class="card-body d-flex flex-column justify-content-between text-white">
+                    <h5 class="card-title fw-light">Product For Evaluation</h5>
+                    <div class="d-flex align-items-center">
+                        <i class="bi bi-clipboard-check fs-1 me-3"></i>
+                        <h2 class="card-text mb-0 fw-bold">{{ $phssForEvaluation ?? 0 }}</h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3 col-sm-6">
+            <div class="card h-100 shadow-sm" style="background-color: #10b981;">
+                <div class="card-body d-flex flex-column justify-content-between text-white">
+                    <h5 class="card-title fw-light">Product Returned</h5>
+                    <div class="d-flex align-items-center">
+                        <i class="bi bi-box-arrow-in-left fs-1 me-3"></i>
+                        <h2 class="card-text mb-0 fw-bold">{{ $phssReturned ?? 0 }}</h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3 col-sm-6">
+            <div class="card h-100 shadow-sm" style="background-color: #6366f1;">
+                <div class="card-body d-flex flex-column justify-content-between text-white">
+                    <h5 class="card-title fw-light">Total Product Borrowed</h5>
+                    <div class="d-flex align-items-center">
+                        <i class="bi bi-boxes fs-1 me-3"></i>
+                        <h2 class="card-text mb-0 fw-bold">{{ $totalPhssItems ?? 0 }}</h2>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <div class="row mt-4 g-4">

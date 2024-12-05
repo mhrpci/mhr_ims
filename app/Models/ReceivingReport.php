@@ -47,4 +47,12 @@ class ReceivingReport extends Model
     {
         return $this->belongsTo(Vendor::class);
     }
+
+    /**
+     * Get the stock in record associated with this receiving report.
+     */
+    public function stockIn()
+    {
+        return $this->hasOne(StockIn::class);
+    }
 }

@@ -43,6 +43,7 @@ class ForPhssController extends Controller
             'hospital_id' => 'required',
             'status' => 'required|in:for_demo,for_evaluation,returned',
             'note' => 'nullable|string|max:1000',
+            'documents.*' => 'nullable|file|mimes:pdf,doc,docx,jpg,jpeg,png|max:10240', // 10MB max
         ]);
 
         try {
@@ -86,6 +87,20 @@ class ForPhssController extends Controller
                 'inventory_id' => $inventory->id,
             ]);
 
+            // Handle document uploads
+            if ($request->hasFile('documents')) {
+                foreach ($request->file('documents') as $document) {
+                    $path = $document->store('phss-documents', 'public');
+                    
+                    $forPhss->documents()->create([
+                        'file_path' => $path,
+                        'original_name' => $document->getClientOriginalName(),
+                        'file_type' => $document->getClientMimeType(),
+                        'uploaded_by' => auth()->id(),
+                    ]);
+                }
+            }
+
             // If status is 'returned', add quantity back to inventory
             if ($validated['status'] === 'returned') {
                 $inventory->quantity += $validated['qty'];
@@ -123,6 +138,7 @@ class ForPhssController extends Controller
         $validated = $request->validate([
             'status' => 'required|in:for_demo,for_evaluation,returned',
             'note' => 'nullable|string',
+            'documents.*' => 'nullable|file|mimes:pdf,doc,docx,jpg,jpeg,png|max:10240', // 10MB max
         ]);
 
         try {
@@ -151,6 +167,21 @@ class ForPhssController extends Controller
             }
 
             $forPhss->update($validated);
+
+            // Handle new document uploads
+            if ($request->hasFile('documents')) {
+                foreach ($request->file('documents') as $document) {
+                    $path = $document->store('phss-documents', 'public');
+                    
+                    $forPhss->documents()->create([
+                        'file_path' => $path,
+                        'original_name' => $document->getClientOriginalName(),
+                        'file_type' => $document->getClientMimeType(),
+                        'uploaded_by' => auth()->id(),
+                    ]);
+                }
+            }
+
             return redirect()
                 ->route('for-phss.index')
                 ->with('success', 'Record updated successfully');

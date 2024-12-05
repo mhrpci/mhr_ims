@@ -15,7 +15,7 @@
 
     <div class="card shadow mb-4">
         <div class="card-body">
-            <form action="{{ route('for-phss.update', $forPhss->id) }}" method="POST">
+            <form action="{{ route('for-phss.update', $forPhss->id) }}" method="POST" enctype="multipart/form-data">
                 @csrf
                 @method('PUT')
                 <div class="row">
@@ -79,6 +79,46 @@
                         <textarea name="note" id="note" class="form-control @error('note') is-invalid @enderror" 
                                   rows="3">{{ old('note', $forPhss->note) }}</textarea>
                         @error('note')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-12 mb-3">
+                        <label class="form-label">Current Documents</label>
+                        <div class="list-group mb-3">
+                            @forelse($forPhss->documents as $document)
+                                <div class="list-group-item d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <i class="bi bi-file-earmark-text me-2"></i>
+                                        {{ $document->original_name }}
+                                        <small class="text-muted">
+                                            (Uploaded {{ $document->created_at->diffForHumans() }})
+                                        </small>
+                                    </div>
+                                    <div>
+                                        <a href="{{ Storage::url($document->file_path) }}" 
+                                           class="btn btn-sm btn-info" 
+                                           target="_blank">
+                                            <i class="bi bi-eye"></i> View
+                                        </a>
+                                    </div>
+                                </div>
+                            @empty
+                                <div class="list-group-item text-muted">
+                                    No documents uploaded yet
+                                </div>
+                            @endforelse
+                        </div>
+
+                        <label for="documents" class="form-label">Upload New Documents</label>
+                        <input type="file" name="documents[]" id="documents" class="form-control" multiple 
+                               accept=".pdf,.doc,.docx,.jpg,.jpeg,.png">
+                        <small class="text-muted">
+                            You can upload additional documents (PDF, Word, Images). Max size: 10MB each.
+                        </small>
+                        @error('documents.*')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
                     </div>

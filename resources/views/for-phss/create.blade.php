@@ -15,7 +15,7 @@
 
     <div class="card shadow mb-4">
         <div class="card-body">
-            <form action="{{ route('for-phss.store') }}" method="POST">
+            <form action="{{ route('for-phss.store') }}" method="POST" enctype="multipart/form-data">
                 @csrf
                 <div class="row">
                     <div class="col-md-6 mb-3">
@@ -25,14 +25,16 @@
                             @foreach($products as $product)
                                 @php
                                     $inventory = $product->inventories
-                                        ->where('branch_id', auth()->user()->branch_id)
+                                        ->where('branch_id', auth()->user()->branch_id ?? $product->branch_id)
                                         ->first();
+                                    
+                                    $availableQty = $inventory ? $inventory->quantity : 0;
                                 @endphp
-                                <option value="{{ $product->id }}" data-inventory="{{ $inventory->quantity ?? 0 }}">
+                                <option value="{{ $product->id }}" data-inventory="{{ $availableQty }}">
                                     {{ $product->name }} 
-                                    (Available: {{ $inventory->quantity ?? 0 }})
+                                    (Available: {{ $availableQty }})
                                     @if(!auth()->user()->branch_id)
-                                        - Branch: {{ $product->branch->name }}  
+                                        - Branch: {{ $product->branch->name }}
                                     @endif
                                 </option>
                             @endforeach
@@ -90,6 +92,20 @@
                         <textarea name="note" id="note" class="form-control @error('note') is-invalid @enderror" 
                                   rows="3">{{ old('note') }}</textarea>
                         @error('note')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-12 mb-3">
+                        <label for="documents" class="form-label">Documents</label>
+                        <input type="file" name="documents[]" id="documents" class="form-control" multiple 
+                               accept=".pdf,.doc,.docx,.jpg,.jpeg,.png">
+                        <small class="text-muted">
+                            You can upload multiple documents (PDF, Word, Images). Max size: 10MB each.
+                        </small>
+                        @error('documents.*')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
                     </div>

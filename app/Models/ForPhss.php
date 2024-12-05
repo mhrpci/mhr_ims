@@ -29,11 +29,19 @@ class ForPhss extends Model
      */
     public function product(): BelongsTo
     {
-        return $this->belongsTo(Product::class);
+        return $this->belongsTo(Product::class, 'product_id', 'id');
     }
 
     public function inventory()
     {
         return $this->belongsTo(Inventory::class);
+    }
+
+    /**
+     * Get the documents for this PHSS record
+     */
+    public function documents()
+    {
+        return $this->hasMany(ForPhssDocument::class);
     }
 }
