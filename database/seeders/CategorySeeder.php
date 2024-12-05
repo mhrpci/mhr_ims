@@ -18,6 +18,10 @@ class CategorySeeder extends Seeder
                 'name' => 'Medical Equipment',
                 'description' => ' ',
             ],
+            [
+                'name' => 'Medical Products',
+                'description' => ' ',
+            ],
         ];
 
         foreach ($categories as $category) {
