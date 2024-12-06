@@ -12,7 +12,6 @@ use App\Http\Controllers\StockOutController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\VendorController;
 use App\Http\Controllers\BranchController;
-use App\Http\Controllers\ReportController;
 use App\Http\Controllers\ToolController;
 use App\Http\Controllers\GlobalSearchController;
 use App\Http\Controllers\HomeController;
@@ -22,6 +21,8 @@ use App\Http\Controllers\StockTransferController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\ReceivingReportController;
 use App\Http\Controllers\ForPhssController;
+use App\Http\Controllers\ReportController;
+use Illuminate\Support\Facades\Auth;
 
 /*
 |--------------------------------------------------------------------------
@@ -57,13 +58,6 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('branches', BranchController::class);
     Route::resource('tools', ToolController::class);
     Route::post('/products/scan', [ProductController::class, 'scanBarcode'])->name('products.scan');
-
-    Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
-    Route::get('/reports/create', [ReportController::class, 'create'])->name('reports.create');
-    Route::post('/reports', [ReportController::class, 'store'])->name('reports.store');
-    Route::get('/reports/{report}', [ReportController::class, 'show'])->name('reports.show');
-    Route::get('/reports/{report}/download', [ReportController::class, 'download'])->name('reports.download');
-    Route::get('/reports/{report}/pdf', [ReportController::class, 'generatePdf'])->name('reports.pdf');
 
     // Stock In Routes
     Route::prefix('stock-ins')->group(function () {
@@ -121,15 +115,6 @@ Route::middleware(['auth'])->group(function () {
         abort(500, 'Registration is currently disabled.');
     })->name('register');
 
-    // Route::post('notifications/{notification}/mark-as-read', function ($notification) {
-    //     auth()->user()->notifications()->findOrFail($notification)->markAsRead();
-    //     return response()->json(['success' => true]);
-    // })->name('notifications.mark-as-read');
-
-    // Route::post('notifications/mark-as-read/{notification}', 'NotificationController@markAsRead')
-    //     ->name('notifications.mark-as-read');
-    // Route::post('notifications/mark-all-read', 'NotificationController@markAllAsRead')
-    //     ->name('notifications.mark-all-read');
 
     // Notification routes
     Route::post('notifications/{id}/mark-as-read', [NotificationController::class, 'markAsRead'])
