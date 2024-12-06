@@ -21,9 +21,7 @@ use App\Http\Controllers\StockTransferController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\ReceivingReportController;
 use App\Http\Controllers\ForPhssController;
-use App\Http\Controllers\ReportController;
 use Illuminate\Support\Facades\Auth;
-
 /*
 |--------------------------------------------------------------------------
 | Web Routes
