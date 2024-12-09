@@ -22,6 +22,7 @@ use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\ReceivingReportController;
 use App\Http\Controllers\ForPhssController;
 use Illuminate\Support\Facades\Auth;
+use App\Http\Controllers\ReportController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -134,6 +135,13 @@ Route::middleware(['auth'])->group(function () {
 
     // PHSS Routes
     Route::resource('for-phss', ForPhssController::class);
+
+    // Reports routes
+    Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
+    Route::post('/reports/generate', [ReportController::class, 'generate'])->name('reports.generate');
+    Route::get('/reports/{report}', [ReportController::class, 'show'])->name('reports.show');
+    Route::get('reports/{report}/download/pdf', [ReportController::class, 'downloadPdf'])->name('reports.download.pdf');
+    Route::get('reports/{report}/download/excel', [ReportController::class, 'downloadExcel'])->name('reports.download.excel');
 
 });
 

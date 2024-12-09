@@ -145,7 +145,7 @@
                 </li>
                 @if(Auth::user()->canManageReports())
                 <li class="nav-item">
-                    <a class="nav-link {{ Request::is('reports*') ? 'active' : '' }}" href="#">
+                    <a class="nav-link {{ Request::is('reports*') ? 'active' : '' }}" href="{{ route('reports.index') }}">
                         <i class="bi bi-file-earmark-text me-2"></i>
                         <span class="d-none d-lg-inline">{{ __('Reports') }}</span>
                     </a>
