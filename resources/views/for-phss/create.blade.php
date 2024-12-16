@@ -132,7 +132,7 @@
         });
 
         // Fetch Hospitals
-        fetch('https://chuweyweb.site/api/hospitals')
+        fetch('http://192.168.1.11:8881/api/hospitals')
             .then(response => {
                 if (!response.ok) {
                     throw new Error('Network response was not ok');
@@ -162,7 +162,7 @@
             });
 
         // Fetch PHSS
-        fetch('https://chuweyweb.site/api/phss')
+        fetch('http://192.168.1.11:8881/api/phss')
             .then(response => {
                 if (!response.ok) {
                     throw new Error('Network response was not ok');

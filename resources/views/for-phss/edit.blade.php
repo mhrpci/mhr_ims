@@ -149,7 +149,7 @@
         const currentHospitalId = '{{ $forPhss->hospital_id }}';
 
         // API Base URL
-        const apiBaseUrl = 'https://chuweyweb.site/api';
+        const apiBaseUrl = 'http://192.168.1.11:8881/api';
 
         // Fetch Hospitals with error handling and retry mechanism
         async function fetchHospitals(retryCount = 0) {
